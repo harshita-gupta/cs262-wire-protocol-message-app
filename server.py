@@ -108,6 +108,7 @@ class AccountList(object):
 accounts = AccountList()
 active_clients = ActiveClients()
 
+
 def create_request(username):
     # define request creation here
     return None
@@ -171,7 +172,11 @@ def handle_client(connection, lock):
     while True:
         try:
             netBuffer = conn.recv(1024)
+        except:
+            print "ERROR: connection down"
+            thread.exit()
 
+        # do something with the received message here
 
 if __name__ == '__main__':
     # set up logging
