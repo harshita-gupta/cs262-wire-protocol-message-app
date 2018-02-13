@@ -22,6 +22,46 @@ opcodes = {'\x10': myServerReceive.create_request,
            }
 
 
+class ActiveClients(object):
+    def __init__(self):
+        """
+        Constructor.
+        @param urls list of urls to check
+        @param output file to write urls output
+        """
+        self.lock = threading.lock()
+
+        # dictionary that stores username as keys and
+        # socket objects as values
+        self.sockets = {}
+
+    def log_out(self, username):
+        if not self.sockets.get(username):
+            return (False, "Username not currently logged in")
+        logging.info("Waiting to obtain lock for active socket conns dict.")
+        with self.lock:
+            self.sockets[username].close()
+            logging.info(
+                "Successfully closed connection with socket for username %s",
+                username)
+        return True
+
+    def log_in(self, username, sock, account_list):
+        logging.info("Waiting to obtain lock for account list")
+        with account_list.lock:
+            if username not in account_list.accounts:
+                return (
+                    False,
+                    "Username %s does not exist any longer." % username)
+            with self.lock:
+                if self.sockets.get(username):
+                    return (
+                        False,
+                        "User %s is already logged in elsewhere." % username)
+                self.sockets[username] = sock
+        return True
+
+
 class AccountList(object):
     def __init__(self):
         """
@@ -65,9 +105,8 @@ class AccountList(object):
         return True
 
 
-# Lock to modify account list, set of accounts
 accounts = AccountList()
-
+active_clients = ActiveClients()
 
 def create_request(username):
     # define request creation here
