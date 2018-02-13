@@ -2,6 +2,8 @@
 import config
 import socket
 
+current_user = None
+
 # Create a socket object
 s = socket.socket()
 

@@ -116,6 +116,7 @@ public class MessageAppProtocol {
      * Opcode: {@code 0x12} <br>
      * Payload:
      * <ul>
+     * <li>(String) username
      * <li>(String) reason
      * </ul>
      * This message indicates that the server rejects the
@@ -450,6 +451,7 @@ public class MessageAppProtocol {
      * {@link #LOG_IN_REQUEST} for some reason, for example:
      * <ul>
      * <li> no user with the username specified exists.
+     * <li> This user is already logged in on another machine.
      * </ul>
      */
     public static final byte LOG_IN_FAILURE = 0x72;
