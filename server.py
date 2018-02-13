@@ -37,7 +37,7 @@ The server has three primary pieces of state that it needs to handle:
 These pieces of state are encapsulated by the ActiveClients and
 AccountList classes. The instance variables of these classes should not be
 directly accessed, but instead object methods should be invoked to make
-state moifications.
+state modifications.
 '''
 
 
@@ -157,7 +157,6 @@ class AccountList(object):
     def list_accounts(self):
         return (False, "not implemented yet")
 
-
 accounts = AccountList()
 active_clients = ActiveClients()
 
@@ -170,6 +169,7 @@ active_clients = ActiveClients()
 
 def create_request(username):
     # define request creation here
+    # this is defined in clientSend now 
     return None
 
 
