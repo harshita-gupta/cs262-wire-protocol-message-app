@@ -33,6 +33,11 @@ The server has three primary pieces of state that it needs to handle:
     currently connected to the server
 3. A mapping from usernames of clients currently logged in to the socket
     socket objects that represent connections with these clients.
+
+These pieces of state are encapsulated by the ActiveClients and
+AccountList classes. The instance variables of these classes should not be
+directly accessed, but instead object methods should be invoked to make
+state moifications.
 '''
 
 
@@ -102,7 +107,7 @@ class AccountList(object):
 
     There are two top-level data structures in AccountList.
 
-    a. The list of accounts self.accounts, which has the lock self.lock
+    a. The list of accounts self.__accounts, which has the lock self.lock
        associated with it.
     b. The dictionary that maps usernames to undelivered messages.
        Each username's undelivered message queue has a lock associated with it.
@@ -113,13 +118,13 @@ class AccountList(object):
         self.lock = threading.Lock()
 
         # list of all valid usernames
-        self.accounts = []
+        self.__accounts = []
 
         # dictionary with usernames as keys
         # values are tuples of
         #       1) a Lock and
         #       2) a deque that contains undelivered messages
-        self.pending_messages = {}
+        self.__pending_messages = {}
 
     def add_account(self, username):
 
@@ -129,29 +134,38 @@ class AccountList(object):
             if username in accounts:
                 return (False, "Username already exists.")
             else:
-                self.accounts.append(username)
-                self.pending_messages[username] = (threading.Lock,
-                                                   deque())
+                self.__accounts.append(username)
+                self.__pending_messages[username] = (threading.Lock,
+                                                     deque())
         return True
 
     def add_pending_message(self, sending_user, receiving_user, message):
         # list of accounts should not be modified while adding a message
         logging.info("waiting to obtain accountList")
         with self.lock:
-            if sending_user not in self.accounts:
+            if sending_user not in self.__accounts:
                 return (False, "Sending user no longer exists")
-            if receiving_user not in self.accounts:
+            if receiving_user not in self.__accounts:
                 return (False, "Receiving user no longer exists")
-            with self.pending_messages[receiving_user][0]:
-                self.pending_messages[receiving_user].append(message)
+            with self.__pending_messages[receiving_user][0]:
+                self.__pending_messages[receiving_user].append(message)
         return True
 
     def delete_account(self, username):
         return (False, "Not implemented yet")
 
+    def list_accounts(self):
+        return (False, "not implemented yet")
+
 
 accounts = AccountList()
 active_clients = ActiveClients()
+
+
+# added the below functions as skeleton code mostly so that we could
+# nicely link to them in the dict of opcodes,
+# they might just end up being wrappers for calls to the state methods,
+# however.
 
 
 def create_request(username):
