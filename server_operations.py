@@ -1,35 +1,36 @@
-import config
 from struct import unpack, pack
-from config import * 
+from config import *
 
 # CREATE REQUEST
 
+
 def send_create_success(connection, username):
-  print"sending create success"
-  print username 
-  connection.send('\x01' + pack('!I',5) +'\x11' + pack(username_fmt, username))
-  return
+    print"sending create success"
+    print username
+    connection.send('\x01' + pack('!I', 5) + '\x11' +
+                    pack(username_fmt, username))
+    return
 
 
 def send_create_failure(connection, username, reason):
-  print"sending create failure"
-  connection.send('\x01' + pack('!I',4) +'\x12')
-  return None
+    print"sending create failure"
+    connection.send('\x01' + pack('!I', 4) + '\x12')
+    return None
 
 
 def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     lock.acquire()
-    success = accounts.add_account(username) 
-    if success == True:
-      send_create_success(connection, username) 
-      active_clients.log_in(username, connection, accounts)
+    success = accounts.add_account(username)
+    if success:
+        send_create_success(connection, username)
+        active_clients.log_in(username, connection, accounts)
     else:
-      send_create_failure(connection, username, success[1])
+        send_create_failure(connection, username, success[1])
 
     lock.release()
-    return 
+    return
 
 
 # DELETE REQUEST

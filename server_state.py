@@ -87,7 +87,7 @@ class AccountList(object):
 
     There are two top-level data structures in AccountList.
 
-    a. The list of accounts self.__accounts, which has the lock self.lock
+    a. The list of accounts self.accounts, which has the lock self.lock
        associated with it.
     b. The dictionary that maps usernames to undelivered messages.
        Each username's undelivered message queue has a lock associated with it.
@@ -98,7 +98,7 @@ class AccountList(object):
         self.lock = threading.Lock()
 
         # list of all valid usernames
-        self.__accounts = set()
+        self.accounts = set()
 
         # dictionary with usernames as keys
         # values are tuples of
@@ -111,10 +111,10 @@ class AccountList(object):
         # TODO check that username is alphanumeric
         logging.info("Waiting to obtain accountList")
         with self.lock:
-            if username in self.__accounts:
+            if username in self.accounts:
                 return (False, "Username already exists.")
             else:
-                self.__accounts.add(username)
+                self.accounts.add(username)
                 self.__pending_messages[username] = (threading.Lock,
                                                      deque())
         return True
@@ -123,9 +123,9 @@ class AccountList(object):
         # list of accounts should not be modified while adding a message
         logging.info("waiting to obtain accountList")
         with self.lock:
-            if sending_user not in self.__accounts:
+            if sending_user not in self.accounts:
                 return (False, "Sending user no longer exists")
-            if receiving_user not in self.__accounts:
+            if receiving_user not in self.accounts:
                 return (False, "Receiving user no longer exists")
             with self.__pending_messages[receiving_user][0]:
                 self.__pending_messages[receiving_user].append(message)
@@ -134,7 +134,7 @@ class AccountList(object):
     def delete_account(self, username, active_clients):
         logging.info("waiting to obtain accountList")
         with self.lock:
-            if username not in self.__accounts:
+            if username not in self.accounts:
                 return (False, "username does not exist.")
             logging.info("Waiting to obtain pending info list")
             with self.__pending_messages[username][0]:
@@ -143,13 +143,13 @@ class AccountList(object):
                            "Cannot delete account until user logs in." %
                            username)
                     return (False, mes)
-                self.__accounts.remove(username)
+                self.accounts.remove(username)
                 self.__pending_messages.remove(username)
                 return True
 
     def list_accounts(self):
         logging.info("waiting to obtain accountlist")
         with self.lock:
-            if not len(self.__accounts):
+            if not len(self.accounts):
                 return "No accounts exist!"
-            return ', '.join(str(e) for e in self.__accounts)
+            return ', '.join(str(e) for e in self.accounts)
