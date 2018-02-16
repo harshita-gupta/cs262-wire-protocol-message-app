@@ -1,5 +1,6 @@
+import config 
 from config import send_message
-from struct import pack, calcsize
+from struct import pack
 from sys import maxint, exit
 
 
@@ -9,14 +10,13 @@ def create_request(conn):
     print "CREATING AN ACCOUNT \n"
     print "enter a username of alphanumeric characters under 20 characters:"
     while True:
+        # ATTN remove int()
         userInput = raw_input('>> ')
-        # if(userInput.isalnum() and len(userInput) <= 20):
-        #     username = userInput
-        #     break
-        username = userInput
-        break
+        if(userInput.isalnum() and len(userInput) <= 5):
+            username = userInput
+            break
 
-    send_message('\x01' + pack('!I', calcsize(username)) + '\x10' + pack('!s', username), conn)
+    send_message('\x01' + pack('!I', 5) + '\x10' + pack(config.username_fmt, username), conn)
 
     return
 
@@ -121,3 +121,4 @@ def create_request(conn):
 #             print "ERROR: connection down"
 #             exit()
 #     return
+
