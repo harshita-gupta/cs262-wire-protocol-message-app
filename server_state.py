@@ -78,6 +78,10 @@ class ActiveClients(object):
                 self.sockets[username] = (lock, sock)
         return True
 
+    def list_active_clients(self):
+        with self.lock:
+            return ', '.join(str(e) for e in self.sockets.keys())
+
 
 class AccountList(object):
     '''
@@ -107,7 +111,6 @@ class AccountList(object):
         self.__pending_messages = {}
 
     def add_account(self, username):
-
         # TODO check that username is alphanumeric
         logging.info("Waiting to obtain accountList")
         with self.lock:
