@@ -114,3 +114,4 @@ if __name__ == '__main__':
         lock = thread.allocate_lock()
         thread.start_new_thread(
             handle_client, (sock, lock, accounts, active_clients))
+        print active_clients

@@ -24,6 +24,7 @@ def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     success = accounts.add_account(username) 
     if success == True:
       send_create_success(connection, username) 
+      active_clients.log_in(username, connection, accounts)
     else:
       send_create_failure(connection, username, success[1])
 
