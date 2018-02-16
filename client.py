@@ -2,10 +2,11 @@
 import sys
 import config
 import socket
+import select
 import clientSend
 from clientReceive import *
 
-current_user = None
+global current_user
 
 version = '\x01'
 
@@ -41,7 +42,7 @@ WELCOME - type the number of a function:
     return startupInput
 
 
-def getSessionInput():
+def prompt_for_session_input():
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
     (3) Send a message
@@ -49,6 +50,11 @@ YOU ARE LOGGED IN! - type the number of a function:
     (5) Log out
     (6) Delete your account
     '''
+    sys.stdout.flush()
+
+
+def getSessionInput():
+    prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
         if int(sessionInput) > 2 and int(sessionInput) < 7:
@@ -83,24 +89,36 @@ def getResponse():
             print "ERROR: connection down"
             sys.exit()
 
-        if len(retBuffer) != 0:
-            header = unpack(config.pack_header_fmt, retBuffer[0:6])
-            # only allow correct version numbers
-            if header[0] == version:
-                opcode = header[2]
-                # send packet to correct handler
-                try:
-                    success, info = opcodes[opcode](sock, retBuffer)
-                except KeyError:
-                    break
-                if success:
-                    # return True and username
-                    return True, info
-                else:
-                    return False, info
-            else:
-                return
-        return
+        if not retBuffer:
+            print "ERROR: connection down"
+            sys.exit()
+
+        header = unpack(config.pack_header_fmt, retBuffer[0:6])
+
+        # only allow correct version numbers
+        if header[0] != version:
+            return False
+
+        # send packet to correct handler based on opcode
+        opcode = header[2]
+
+        try:
+            success, info = opcodes[opcode](sock, retBuffer)
+        except KeyError:
+            break
+
+        return success, info
+
+
+def require_log_in():
+    while True:
+        startupInput = getStartupInput()
+        processInput(startupInput)
+        success, username = getResponse()
+        if success:
+            return username
+        else:
+            print username
 
 
 if __name__ == '__main__':
@@ -113,23 +131,33 @@ if __name__ == '__main__':
         print "ERROR: could not connect to port: " + config.port
         sys.exit()
 
+    # UPON LAUNCHING THE PROGRAM, USER MUST LOG IN OR
+    # CREATE AN ACCOUNT
+    current_user = require_log_in()
+
+    prompt_for_session_input()
+
     # PROCESS INPUT
     while True:
+        socket_list = [sys.stdin, sock]
 
-        while True:
-            startupInput = getStartupInput()
-            processInput(startupInput)
-            success, username = getResponse()
-            if success:
-                current_user = username
-                break
+        # Get the list sockets which are readable
+        read_sockets, write_sockets, error_sockets = select.select(
+            socket_list, [], [])
 
-        while True:
-            sessionInput = getSessionInput()
-            processInput(sessionInput)
-            getResponse()
-            if int(sessionInput) == 5:
-                current_user = None
-                break
+        for s in read_sockets:
+            # incoming message from remote server
+            if s == sock:
+                # deal w that shit
+                data = sock.getResponse()
+
+            # user entered a message
+            else:
+                while True:
+                    sessionInput = getSessionInput()
+                    processInput(sessionInput)
+                    getResponse()
+                    if int(sessionInput) == 5:
+                        current_user = require_log_in()
 
     # mySocket.close()

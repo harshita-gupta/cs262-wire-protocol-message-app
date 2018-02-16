@@ -7,7 +7,7 @@ import traceback
 import thread
 import config
 import logging
-from server_operations import opcodes #log_out_success
+from server_operations import opcodes
 from server_state import AccountList, ActiveClients
 from struct import unpack
 
