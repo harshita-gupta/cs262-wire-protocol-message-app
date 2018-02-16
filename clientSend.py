@@ -11,11 +11,13 @@ def create_request(conn):
     while True:
         # ATTN remove int()
         userInput = int(raw_input('>> '))
-        if(userInput.isalnum() and len(userInput) <= 20):
-            username = userInput
-            break
+        # if(userInput.isalnum() and len(userInput) <= 20):
+        #     username = userInput
+        #     break
+        username = userInput
+        break
 
-    send_message('\x01' + pack('!I', 8) + '\x10' + pack('!II', username), conn)
+    send_message('\x01' + pack('!I', 4) + '\x10' + pack('!I', username), conn)
 
     return
 

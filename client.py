@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        sock.connect((raw_input("IP:"), config.port))
+        sock.connect(('127.0.0.1', config.port))
     except:
         print "ERROR: could not connect to port: " + config.port
         sys.exit()
@@ -41,6 +41,6 @@ if __name__ == '__main__':
     while True:
         startupInput = getStartupInput()
         processInput(startupInput)
-        getResponse()
+        # getResponse()
 
     # mySocket.close()
