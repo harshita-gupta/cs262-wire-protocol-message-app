@@ -1,15 +1,6 @@
 from struct import unpack, pack
 from config import *
-from server_state import send_or_queue_message
-
-# Operation codes that can be received and processed by the server.
-opcodes = {'\x10': create_request,
-           '\x20': login_request,
-           # '\x30': send_message_request,
-           # '\x50': list_users_request,
-           # '\x60': log_out,
-           # '\x70': log_in_request
-           }
+# from server_state import send_or_queue_message
 
 # CREATE REQUEST 
 
@@ -113,5 +104,13 @@ def log_in_request(connection, buf, _,
                    lock, accounts, active_clients, pack_fmt):
     return None
 
+# Operation codes that can be received and processed by the server.
+opcodes = {'\x10': create_request,
+           '\x20': login_request,
+           # '\x30': send_message_request,
+           # '\x50': list_users_request,
+           # '\x60': log_out,
+           # '\x70': log_in_request
+           }
 
 
