@@ -41,14 +41,12 @@ def handle_client(connection, lock, accounts, active_clients):
             # version number, payload length, op code
             # therefore !cIc
             header = unpack(config.pack_header_fmt, netBuffer[0:6])
-
             # only allow correct version numbers and
             # buffers that are of the appropriate length
             sent_version = header[0]
             payload_len = header[1]
             if sent_version == version and len(netBuffer) == payload_len + 6:
                 opcode = header[2]
-
                 # try to send packet to correct handler
                 try:
                     opcodes[opcode](
@@ -58,7 +56,8 @@ def handle_client(connection, lock, accounts, active_clients):
                 # catch unhandled opcodes
                 # we allow one retry before the client is booted
                 # for sending useless inputs too often.
-                except KeyError:
+                except:
+                    print "failed"
                     if second_attempt:
                         # disconnect the client
                         log_out_success(connection)

@@ -12,3 +12,7 @@ def create_success(conn, netBuffer):
 def create_failure(conn, netBuffer):
     print "Account creation failure--username already exists"
     return False, ""
+
+def logout_success(conn, netBuffer):
+	print "Successfully logged out"
+	return True, ""

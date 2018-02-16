@@ -35,7 +35,8 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     with lock:
-        if username in accounts.accounts and username not in active_clients.sockets: 
+        # if username in accounts.accounts and username not in active_clients.sockets: 
+        if username in accounts.accounts: 
             print "login ok"
         # if success:
         #     send_create_success(conn, username)
@@ -44,6 +45,19 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
         #     send_create_failure(conn, username, success[1])
     return
 
+# LOGOUT REQUEST
+def send_logout_success(connection):
+    print"sending logout success"
+    connection.send('\x01' + pack('!I', 0) + '\x61')
+    return
+def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    print "54"
+    values = unpack(pack_fmt, buf[6:14])
+    username = values[0]
+    with lock:
+        active_clients.log_out(username)
+    send_login_success(conn)
+    return
 
 # DELETE REQUEST
 
@@ -107,9 +121,9 @@ def log_in_request(connection, buf, _,
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
            '\x20': login_request,
+           '\x60': logout_request,
            # '\x30': send_message_request,
            # '\x50': list_users_request,
-           # '\x60': log_out,
            # '\x70': log_in_request
            }
 
