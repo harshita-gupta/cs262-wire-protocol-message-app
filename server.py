@@ -45,12 +45,10 @@ def handle_client(connection, lock, accounts, active_clients):
             # only allow correct version numbers and
             # buffers that are of the appropriate length
             if header[0] == version and len(netBuffer) == header[1] + 6:
-                print "50"
                 opcode = header[2]
 
                 # try to send packet to correct handler
                 try:
-                    print "here"
                     opcodes[opcode](
                         connection, netBuffer, lock, accounts, active_clients,
                         config.request_body_fmt[opcode])
@@ -69,7 +67,6 @@ def handle_client(connection, lock, accounts, active_clients):
                         second_attempt = 1
                         unknown_opcode(connection)
             else:
-                print "73"
                 # TODO can potentially check to make sure that
                 # there is no pending delivery waiting in socket
                 continue
@@ -113,8 +110,6 @@ if __name__ == '__main__':
         # recordConnect(str(addr))
 
         # send a thank you message to the client.
-        sock.send('Thank you for connecting')
-
         # start a new thread
         lock = thread.allocate_lock()
         thread.start_new_thread(
