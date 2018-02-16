@@ -5,13 +5,13 @@ from struct import unpack, pack
 
 def send_create_success(connection, username):
   print"sending create success"
-  connection.send('\x01' + pack('!I',4) +'\x11' + pack('!I',55))
+  connection.send('\x01' + pack('!I',4) +'\x11')
   return
 
 
 def send_create_failure(connection, username, reason):
   print"sending create failure"
-  connection.send('\x01' + pack('!I',4) +'\x12' + pack('!I',54))
+  connection.send('\x01' + pack('!I',4) +'\x12')
   return None
 
 
@@ -20,7 +20,7 @@ def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     username = values[0]
     lock.acquire()
     success = accounts.add_account(username) 
-    if success:
+    if success == True:
       send_create_success(connection, username) 
     else:
       send_create_failure(connection, username, success[1])
