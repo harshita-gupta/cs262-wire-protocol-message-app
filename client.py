@@ -3,7 +3,7 @@ import sys
 import config
 import socket
 import clientSend
-from clientReceive import * 
+from clientReceive import *
 
 current_user = None
 
@@ -11,8 +11,8 @@ version = '\x01'
 
 #opcode associations; note that these opcodes will be returned by the server
 opcodes = {'\x11': create_success,
-           '\x12': create_failure,  
-           # '\x21': delete_success,
+           '\x12': create_failure,
+           '\x61': logout_success,
            # '\x22': general_failure,
            # '\x31': deposit_success,
            # '\x32': general_failure,
@@ -31,18 +31,27 @@ WELCOME - type the number of a function:
     (1) Create Account
     (2) Log In
     '''
-    startupInput = raw_input('>> ')
+    while True:
+        startupInput = raw_input('>> ')
+        if int(startupInput)==1 or int(startupInput)==2:
+            break
+
     return startupInput
 
 def getSessionInput():
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
-    (1) Send a message 
-    (2) List all accounts 
-    (3) Delete your account
+    (3) Send a message
+    (4) List all accounts
+    (5) Log out
+    (6) Delete your account
     '''
-    sessionInput = raw_input('>> ')
-    return sessionInput 
+    while True:
+        sessionInput = raw_input('>> ')
+        if int(sessionInput) > 2 and int(sessionInput) < 7:
+            break
+
+    return sessionInput
 
 
 def processInput(requestNumber):
@@ -50,9 +59,13 @@ def processInput(requestNumber):
     if requestNumber == str(1):
         clientSend.create_request(sock)
 
-    # delete
+    # login
     elif requestNumber == str(2):
         clientSend.login_request(sock)
+
+    # logout
+    elif requestNumber == str(5):
+        clientSend.logout_request(sock, current_user)
 
 
     return
@@ -66,7 +79,7 @@ def getResponse():
             #close the client if the connection is down
             print "ERROR: connection down"
             sys.exit()
-            
+
         if len(retBuffer) != 0:
             header = unpack(config.pack_header_fmt, retBuffer[0:6])
             #only allow correct version numbers
@@ -77,14 +90,14 @@ def getResponse():
                     success, info = opcodes[opcode](sock,retBuffer)
                 except KeyError:
                     break
-                if success == True: 
-                    # return True and username 
+                if success == True:
+                    # return True and username
                     return True, info
                 else:
                     return False, info
             else:
-                return 
-        return 
+                return
+        return
 
 if __name__ == '__main__':
 
@@ -96,15 +109,25 @@ if __name__ == '__main__':
         sys.exit()
 
     while True:
-        startupInput = getStartupInput()
-        processInput(startupInput) 
-        success, username = getResponse() 
-        if success == True: 
-            current_user = username
-            break 
 
-    while True:
-        sessionInput = getSessionInput() 
-        getResponse()
+        print "heeee"
+        print current_user
+
+        while True:
+            startupInput = getStartupInput()
+            processInput(startupInput)
+            success, username = getResponse()
+            if success == True:
+                current_user = username
+                print "here"
+                break
+
+        while True:
+            sessionInput = getSessionInput()
+            processInput(sessionInput)
+            getResponse()
+            if sessionInput == 5:
+                current_user = None
+                break
 
     # mySocket.close()

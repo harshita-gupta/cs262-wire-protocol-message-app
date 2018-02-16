@@ -7,15 +7,15 @@ from config import *
 
 def send_create_success(connection, username):
     print"sending create success"
-    connection.send('\x01' + pack('!I', 5) + '\x11' +
-                    pack(username_fmt, username))
+    send_message('\x01' + pack('!I', 5) + '\x11' +
+                 pack(username_fmt, username), connection)
     return
 
 
 def send_create_failure(connection, username, reason):
     print"sending create failure"
     # TODO question for lisa: are we sending the reason right now?
-    connection.send('\x01' + pack('!I', 4) + '\x12')
+    send_message('\x01' + pack('!I', 4) + '\x12', connection)
     return None
 
 
@@ -45,6 +45,25 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
         #     active_clients.log_in(username, lock, conn, accounts)
         # else:
         #     send_create_failure(conn, username, success[1])
+    return
+
+
+# LOGOUT REQUEST
+
+def send_logout_success(connection):
+    print"sending logout success"
+    send_message('\x01' + pack('!I', 0) + '\x61', connection)
+    return
+
+
+def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    values = unpack(pack_fmt, buf[6:14])
+    username = values[0]
+    with lock:
+        print "active: " + str(active_clients.list_active_clients())
+        print(active_clients.log_out(username))
+        print "active: " + str(active_clients.list_active_clients())
+    send_logout_success(conn)
     return
 
 
@@ -127,13 +146,12 @@ def log_in_request(connection, buf, _,
                    lock, accounts, active_clients, pack_fmt):
     return None
 
+
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
            '\x20': login_request,
+           '\x60': logout_request,
            # '\x30': send_message_request,
            # '\x50': list_users_request,
-           # '\x60': log_out,
            # '\x70': log_in_request
            }
-
-

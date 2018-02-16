@@ -21,7 +21,7 @@ request_body_fmt = {
     '\x20': username_fmt,  # delete request
     '\x50': "",            # list users request
     '\x51': "!%is",            # list users success, has list attached
-    '\x70': username_fmt,  # log in request
+    '\x60': username_fmt,  # log out request
 
     ########
     # SUCCESS CODES

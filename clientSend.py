@@ -34,6 +34,13 @@ def login_request(conn):
 
     return
 
+# log out 
+def logout_request(conn, username):
+    print "LOGGING OUT \n"
+    send_message('\x01' + pack('!I', 5) + '\x60' + pack(config.username_fmt, username), conn)
+
+    return
+
 # #deposit to an existing account
 # def deposit_request(conn):
 #     print "DEPOSITING SOME DOUGH \n"
