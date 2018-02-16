@@ -85,6 +85,7 @@ def getResponse():
             #only allow correct version numbers
             if header[0] == version:
                 opcode = header[2]
+                print opcode
                 #send packet to correct handler
                 try:
                     success, info = opcodes[opcode](sock,retBuffer)
@@ -109,8 +110,6 @@ if __name__ == '__main__':
         sys.exit()
 
     while True:
-
-        print "heeee"
         print current_user
 
         while True:
@@ -123,10 +122,11 @@ if __name__ == '__main__':
                 break
 
         while True:
+            print current_user
             sessionInput = getSessionInput()
             processInput(sessionInput)
             getResponse()
-            if sessionInput == 5:
+            if int(sessionInput) == 5:
                 current_user = None
                 break
 

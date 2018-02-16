@@ -66,7 +66,6 @@ class ActiveClients(object):
                 # self.sockets[username][1].close()
                 logging.info(
                     "Successfully logged out %s's socket", username)
-                print self.sockets.keys()
                 del self.sockets[username]
         return (True, "")
 

@@ -63,14 +63,7 @@ def send_logout_success(connection):
 def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    print "active: " + str(active_clients.list_active_clients())
-    success, error = active_clients.log_out(username)
-    print "success" + str(success)
-    print success
-    print "active: " + str(active_clients.list_active_clients())
-    # NOTE TO LISA: there is a case in which active_clients.log_out will
-    # return failure, i.e. if the user is already logged out --
-    # we should accmodate for this i think?
+    active_clients.log_out(username)
     with lock:
         send_logout_success(conn)
     return
