@@ -11,6 +11,8 @@ opcodes = {'\x10': create_request,
            # '\x70': log_in_request
            }
 
+# CREATE REQUEST 
+
 def send_create_success(connection, username):
     print"sending create success"
     connection.send('\x01' + pack('!I', 5) + '\x11' +
@@ -35,6 +37,20 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
             active_clients.log_in(username, lock, conn, accounts)
         else:
             send_create_failure(conn, username, success[1])
+    return
+
+# LOGIN REQUEST
+def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    values = unpack(pack_fmt, buf[6:14])
+    username = values[0]
+    with lock:
+        if username in accounts.accounts and username not in active_clients.sockets: 
+            print "login ok"
+        # if success:
+        #     send_create_success(conn, username)
+        #     active_clients.log_in(username, lock, conn, accounts)
+        # else:
+        #     send_create_failure(conn, username, success[1])
     return
 
 
