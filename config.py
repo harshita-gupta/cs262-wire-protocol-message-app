@@ -1,4 +1,5 @@
 import thread
+import logging
 
 # Define the port on which you want to connect
 port = 12345
@@ -50,10 +51,10 @@ request_body_fmt = {
     ########
 
     # # send message request, must format with length of message string
-    # '\x30': username_fmt + "%is%is" % username_length,
+    '\x30': username_fmt + ("%is" % username_length) + "%is",
 
-    # # deliver message request, must format with length of message string
-    # '\x80': username_fmt + "%is%is" % username_length
+    # deliver message request, must format with length of message string
+    '\x80': username_fmt + ("%is" % username_length) + "%is",
 
 }
 
@@ -61,11 +62,16 @@ logging_fmt = ('[thread %(threadname)s;'
                '%(funcName)20s() %(asctime)s %(levelname)s] %(message)s')
 
 
+logging.basicConfig(
+    format=logging_fmt,
+    filename="serverLog.log")
+
+
 def send_message(message, conn):
     try:
         conn.send(message)
     except:
         # close the client if the connection is down
-        print "ERROR: connection down"
+        logging.error("ERROR: connection down")
         thread.exit()
     return
