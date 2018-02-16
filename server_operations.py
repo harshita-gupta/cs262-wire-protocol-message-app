@@ -16,8 +16,7 @@ def send_create_failure(connection, username, reason):
     print"sending create failure"
     # TODO question for lisa: are we sending the reason right now?
     send_message(
-        '\x01' + pack('!I', len(reason)) + '\x12' +
-        pack(request_body_fmt['\x12'], reason),
+        '\x01' + pack('!I', 0) + '\x12',
         connection)
     return None
 
