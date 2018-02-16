@@ -1,5 +1,5 @@
 from config import send_message
-from struct import pack
+from struct import pack, calcsize
 from sys import maxint, exit
 
 
@@ -9,15 +9,14 @@ def create_request(conn):
     print "CREATING AN ACCOUNT \n"
     print "enter a username of alphanumeric characters under 20 characters:"
     while True:
-        # ATTN remove int()
-        userInput = int(raw_input('>> '))
+        userInput = raw_input('>> ')
         # if(userInput.isalnum() and len(userInput) <= 20):
         #     username = userInput
         #     break
         username = userInput
         break
 
-    send_message('\x01' + pack('!I', 4) + '\x10' + pack('!I', username), conn)
+    send_message('\x01' + pack('!I', calcsize(username)) + '\x10' + pack('!s', username), conn)
 
     return
 
