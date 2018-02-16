@@ -1,5 +1,6 @@
 from struct import unpack, pack
 from config import *
+from server_state import send_or_queue_message
 
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
@@ -24,16 +25,16 @@ def send_create_failure(connection, username, reason, lock):
     return None
 
 
-def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
+def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     with lock:
         success = accounts.add_account(username)
         if success:
-            send_create_success(connection, username)
-            active_clients.log_in(username, lock, connection, accounts)
+            send_create_success(conn, username)
+            active_clients.log_in(username, lock, conn, accounts)
         else:
-            send_create_failure(connection, username, success[1])
+            send_create_failure(conn, username, success[1])
     return
 
 
@@ -47,7 +48,7 @@ def send_delete_failure(username, reason):
     return None
 
 
-def delete_request(connection, buf, lock, accounts, active_clients, pack_fmt):
+def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return None
 
 
@@ -62,8 +63,10 @@ def send_message_success():
     return None
 
 
-def send_message_request(connection,
-                         buf, lock, accounts, active_clients, pack_fmt):
+def send_message_request(connection, buf, payload_len,
+                         lock, accounts, active_clients, pack_fmt):
+    # values = unpack(pack_fmt, buf[])
+    # send_or_queue_message(accounts, active_clients, )
     return None
 
 
@@ -74,7 +77,7 @@ def send_list_users():
 
 
 def list_users_request(connection,
-                       buf, lock, accounts, active_clients, pack_fmt):
+                       buf, _, lock, accounts, active_clients, pack_fmt):
     return None
 
 
@@ -84,13 +87,14 @@ def log_out_success(connection):
     return None
 
 
-def log_out(connection, buf, lock, accounts, active_clients, pack_fmt):
+def log_out(connection, buf, _, lock, accounts, active_clients, pack_fmt):
     return None
 
 
 # LOG IN FUNCTIONS
 
-def log_in_request(connection, buf, lock, accounts, active_clients, pack_fmt):
+def log_in_request(connection, buf, _,
+                   lock, accounts, active_clients, pack_fmt):
     return None
 
 
