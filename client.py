@@ -103,7 +103,6 @@ if __name__ == '__main__':
             current_user = username
             break 
 
-    print current_user 
     while True:
         sessionInput = getSessionInput() 
         getResponse()
