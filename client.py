@@ -74,14 +74,14 @@ def getResponse():
                 opcode = header[2]
                 #send packet to correct handler
                 try:
-                    success, username = opcodes[opcode](sock,retBuffer)
+                    success, info = opcodes[opcode](sock,retBuffer)
                 except KeyError:
                     break
                 if success == True: 
                     # return True and username 
-                    return True, username
+                    return True, info
                 else:
-                    return False, username
+                    return False, info
             else:
                 return 
         return 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         if success == True: 
             current_user = username
             break 
-            
+
     print current_user 
     while True:
         sessionInput = getSessionInput() 
