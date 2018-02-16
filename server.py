@@ -44,7 +44,9 @@ def handle_client(connection, lock, accounts, active_clients):
 
             # only allow correct version numbers and
             # buffers that are of the appropriate length
-            if header[0] == version and len(netBuffer) == header[1] + 6:
+            sent_version = header[0]
+            payload_len = header[1]
+            if sent_version == version and len(netBuffer) == payload_len + 6:
                 opcode = header[2]
 
                 # try to send packet to correct handler
