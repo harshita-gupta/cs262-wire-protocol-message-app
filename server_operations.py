@@ -1,6 +1,8 @@
 import config
+from struct import unpack
 
 # CREATE REQUEST
+
 def send_create_success(username):
 
     return None
@@ -10,9 +12,12 @@ def send_create_failure(username, reason):
     return None
 
 
-def create_request(connection, buf, lock, accounts, active_clients):
-    # define request creation here
-    # this is defined in clientSend now
+def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
+    values = unpack(pack_fmt, buf[6:14])
+
+    lock.acquire()
+    accounts.add_account(values[0])
+
     return None
 
 
@@ -26,14 +31,11 @@ def send_delete_failure(username, reason):
     return None
 
 
-def delete_request(connection, buf, lock, accounts, active_clients):
+def delete_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
 # SEND MESSAGE REQUEST
-
-def send_message_request(connection, buf, lock, accounts, active_clients):
-    return None
 
 
 def send_message_failure(reason):
@@ -44,11 +46,19 @@ def send_message_success():
     return None
 
 
-def list_users_request(connection, buf, lock, accounts, active_clients):
+def send_message_request(connection,
+                         buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
+# LIST USERS FUNCTIONS
+
 def send_list_users():
+    return None
+
+
+def list_users_request(connection,
+                       buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
@@ -58,13 +68,13 @@ def log_out_success(connection):
     return None
 
 
-def log_out(connection, buf, lock, accounts, active_clients):
+def log_out(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
 # LOG IN FUNCTIONS
 
-def log_in_request(connection, buf, lock, accounts, active_clients):
+def log_in_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 

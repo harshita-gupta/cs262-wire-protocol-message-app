@@ -8,6 +8,7 @@ import config
 import logging
 from server_operations import opcodes, log_out_success
 from server_state import AccountList, ActiveClients
+from struct import unpack
 
 
 version = '\x01'
@@ -39,17 +40,20 @@ def handle_client(connection, lock, accounts, active_clients):
             # unpack the header of the message, i.e.
             # version number, payload length, op code
             # therefore !cIc
-            header = netBuffer.unpack(config.pack_header_fmt, netBuffer[0:6])
+            header = unpack(config.pack_header_fmt, netBuffer[0:6])
 
             # only allow correct version numbers and
             # buffers that are of the appropriate length
             if header[0] == version and len(netBuffer) == header[1] + 6:
+                print "50"
                 opcode = header[2]
 
                 # try to send packet to correct handler
                 try:
+                    print "here"
                     opcodes[opcode](
-                        connection, netBuffer, lock, accounts, active_clients)
+                        connection, netBuffer, lock, accounts, active_clients,
+                        config.request_body_fmt[opcode])
 
                 # catch unhandled opcodes
                 # we allow one retry before the client is booted
@@ -65,6 +69,7 @@ def handle_client(connection, lock, accounts, active_clients):
                         second_attempt = 1
                         unknown_opcode(connection)
             else:
+                print "73"
                 # TODO can potentially check to make sure that
                 # there is no pending delivery waiting in socket
                 continue
@@ -78,6 +83,7 @@ if __name__ == '__main__':
 
     # next create a socket object
     s = socket.socket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print "Socket successfully created"
 
     # Next bind to the port
@@ -104,7 +110,7 @@ if __name__ == '__main__':
         sock, addr = s.accept()
 
         # log connection
-        recordConnect(str(addr))
+        # recordConnect(str(addr))
 
         # send a thank you message to the client.
         sock.send('Thank you for connecting')
