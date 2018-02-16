@@ -146,3 +146,10 @@ class AccountList(object):
                 self.__accounts.remove(username)
                 self.__pending_messages.remove(username)
                 return True
+
+    def list_accounts(self):
+        logging.info("waiting to obtain accountlist")
+        with self.lock:
+            if not len(self.__accounts):
+                return "No accounts exist!"
+            return ', '.join(str(e) for e in self.__accounts)
