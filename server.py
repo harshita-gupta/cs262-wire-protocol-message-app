@@ -52,8 +52,8 @@ def handle_client(connection, lock, accounts, active_clients):
                 # try to send packet to correct handler
                 try:
                     opcodes[opcode](
-                        connection, netBuffer, lock, accounts, active_clients,
-                        config.request_body_fmt[opcode])
+                        connection, netBuffer, payload_len, lock, accounts,
+                        active_clients, config.request_body_fmt[opcode])
 
                 # catch unhandled opcodes
                 # we allow one retry before the client is booted
