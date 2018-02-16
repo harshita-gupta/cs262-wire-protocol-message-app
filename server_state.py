@@ -60,7 +60,7 @@ class ActiveClients(object):
                 logging.info(
                     "Successfully closed connection with %s's socket",
                     username)
-                self.sockets[username] = None
+                self.sockets.remove(username)
         return True
 
     def log_in(self, username, lock, sock, account_list):
