@@ -13,12 +13,12 @@ from collections import deque
 version = '\x01'
 
 # Operation codes that can be received and processed by the server.
-opcodes = {'\x10': myServerReceive.create_request,
-           '\x20': myServerReceive.delete_request,
-           '\x30': myServerReceive.deposit_request,
-           '\x40': myServerReceive.withdraw_request,
-           '\x50': myServerReceive.balance_request,
-           '\x60': myServerReceive.end_session
+opcodes = {'\x10': serverReceive.create_request,
+           # '\x20': myServerReceive.delete_request,
+           # '\x30': myServerReceive.deposit_request,
+           # '\x40': myServerReceive.withdraw_request,
+           # '\x50': myServerReceive.balance_request,
+           # '\x60': myServerReceive.end_session
            }
 
 
@@ -225,7 +225,7 @@ def recordConnect(addr):
 
 
 # threaded method for handling an individual client
-def handle_client(connection, lock):
+def handle_client(connection, lock, myData):
     # keep track of erroneous opcodes
     second_attempt = 0
     while True:
@@ -234,6 +234,8 @@ def handle_client(connection, lock):
         except:
             print "ERROR: connection down"
             thread.exit()
+        if len(netBuffer) >= 6:
+            header = 
 
         # do something with the received message here
 
@@ -242,7 +244,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='[thread %(threadname)s; %(funcName)20s() %(asctime)s [%(levelname)s] %(message)s',
         filename="serverLog.log")
-
+    myData = dict() 
     # next create a socket object
     s = socket.socket()
     print "Socket successfully created"
@@ -274,4 +276,4 @@ if __name__ == '__main__':
 
         # start a new thread
         lock = thread.allocate_lock()
-        thread.start_new_thread(handle_client, (sock, lock))
+        thread.start_new_thread(handle_client, (sock, lock, myData))

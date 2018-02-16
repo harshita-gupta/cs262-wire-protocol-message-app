@@ -29,7 +29,7 @@ if __name__ == '__main__':
         
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-		s.connect((raw_input("IP:"), config.port))
+		sock.connect((raw_input("IP:"), config.port))
     except:
         print "ERROR: could not connect to port: " + myPort
         sys.exit()

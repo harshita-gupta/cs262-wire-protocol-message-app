@@ -7,31 +7,32 @@ def create_request(conn):
     print "CREATING AN ACCOUNT \n"
     print "enter a username of alphanumeric characters under 20 characters:"
     while True:
-        userInput = raw_input('>> ')
+        # ATTN remove int()
+        userInput = int(raw_input('>> '))
         if(userInput.isalnum() and len(userInput)<=20):
             username = userInput
             break
     
-    send_message('\x01' + pack('!I',8) + '\x10' + pack('!II',bal,act),conn)
+    send_message('\x01' + pack('!I',8) + '\x10' + pack('!II',username),conn)
     
     return
 
 #delete an existing account
-def delete_request(conn):
-    print "DELETING AN ACCOUNT \n"
-    print "enter a an account number 1-100:"
-    while True:
-        try:
-            netBuffer = int(raw_input('>> '))
-        except ValueError:
-            continue
+# def delete_request(conn):
+#     print "DELETING AN ACCOUNT \n"
+#     print "enter a an account number 1-100:"
+#     while True:
+#         try:
+#             netBuffer = int(raw_input('>> '))
+#         except ValueError:
+#             continue
         
-        if(netBuffer > 0 and netBuffer <= 100):
-            act = netBuffer
-            break
+#         if(netBuffer > 0 and netBuffer <= 100):
+#             act = netBuffer
+#             break
     
-    send_message('\x01' + pack('!I',4) + '\x20' + pack('!I',act),conn)
-    return
+#     send_message('\x01' + pack('!I',4) + '\x20' + pack('!I',act),conn)
+#     return
 
 # #deposit to an existing account
 # def deposit_request(conn):
