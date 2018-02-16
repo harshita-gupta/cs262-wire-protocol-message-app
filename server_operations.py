@@ -1,18 +1,6 @@
 import config
 
-
-# added the below functions as skeleton code mostly so that we could
-# nicely link to them in the dict of opcodes,
-# they might just end up being wrappers for calls to the state methods,
-# however.
-
-
-def create_request(username):
-    # define request creation here
-    # this is defined in clientSend now
-    return None
-
-
+# CREATE REQUEST
 def send_create_success(username):
 
     return None
@@ -22,9 +10,13 @@ def send_create_failure(username, reason):
     return None
 
 
-def delete_request(username):
+def create_request(connection, buf, lock, accounts, active_clients):
+    # define request creation here
+    # this is defined in clientSend now
     return None
 
+
+# DELETE REQUEST
 
 def send_delete_success(username):
     return None
@@ -34,7 +26,13 @@ def send_delete_failure(username, reason):
     return None
 
 
-def send_message_request(sending_user, receiving_user, message):
+def delete_request(connection, buf, lock, accounts, active_clients):
+    return None
+
+
+# SEND MESSAGE REQUEST
+
+def send_message_request(connection, buf, lock, accounts, active_clients):
     return None
 
 
@@ -46,15 +44,11 @@ def send_message_success():
     return None
 
 
-def list_users_request():
+def list_users_request(connection, buf, lock, accounts, active_clients):
     return None
 
 
-def send_list_users_success():
-    return None
-
-
-def send_list_users_failure():
+def send_list_users():
     return None
 
 
@@ -64,13 +58,13 @@ def log_out_success(connection):
     return None
 
 
-def log_out():
+def log_out(connection, buf, lock, accounts, active_clients):
     return None
 
 
 # LOG IN FUNCTIONS
 
-def log_in_request():
+def log_in_request(connection, buf, lock, accounts, active_clients):
     return None
 
 

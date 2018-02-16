@@ -23,11 +23,6 @@ package edu.harvard.cs262.atm;
  *
  * </ul>
  * <p>
- * Because there is no "start session" command in the protocol that will
- * establish a connection to the server, we always send the protocol version
- * number. Note that since there is no login operation, the server is expected
- * to accept any socket connection from any client.
- * <p>
  * The {@code protocol version} will be checked by the server to ensure that the
  * client and server are using the same protocol or versions of the protocol
  * that are compatible. If the server determines that the protocol version used
@@ -38,8 +33,8 @@ package edu.harvard.cs262.atm;
  * <p>
  * The total length of a message must not be greater than 1024 bytes; given the
  * header information this means that the payload of a message cannot be greater
- * than 1018 bytes. This only limits the size of the error strings that are sent
- * back to the client, but these should be kept reasonably short anyway. This
+ * than 1018 bytes. This limits the size of the error strings that are sent
+ * back to the client as well as the size of the messages sent. This
  * also means that the buffers that are allocated for the sending and receiving
  * of messages can be kept to a more reasonable size.
  * <p>
@@ -116,7 +111,6 @@ public class MessageAppProtocol {
      * Opcode: {@code 0x12} <br>
      * Payload:
      * <ul>
-     * <li>(String) username
      * <li>(String) reason
      * </ul>
      * This message indicates that the server rejects the
@@ -366,20 +360,20 @@ public class MessageAppProtocol {
      */
     public static final byte LIST_USERS_SUCCESS = 0x51;
 
-    /**
-     * List users failure. Server response to a client's {@link #LIST_USERS_REQUEST}. <br>
-     * Opcode: {@code 0x52} <br>
-     * Payload:
-     * <ul>
-     * <li>(String) reason
-     * </ul>
-     * This message indicates that the server rejects the
-     * {@link #LIST_USERS_REQUEST} for some reason, for example:
-     * <ul>
-     * <li> no users exist.
-     * </ul>
-     */
-    public static final byte LIST_USERS_FAILURE = 0x52;
+    // /** IMPOSSIBLE SO REMOVED
+    //  * List users failure. Server response to a client's {@link #LIST_USERS_REQUEST}. <br>
+    //  * Opcode: {@code 0x52} <br>
+    //  * Payload:
+    //  * <ul>
+    //  * <li>(String) reason
+    //  * </ul>
+    //  * This message indicates that the server rejects the
+    //  * {@link #LIST_USERS_REQUEST} for some reason, for example:
+    //  * <ul>
+    //  * <li> no users exist.
+    //  * </ul>
+    //  */
+    // public static final byte LIST_USERS_FAILURE = 0x52;
 
     /**
      * Request from a client to a server to disconnect that the user is logging out.

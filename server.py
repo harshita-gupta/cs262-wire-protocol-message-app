@@ -5,9 +5,7 @@
 import socket
 import thread
 import config
-# import threading
 import logging
-# from collections import deque
 from server_operations import opcodes, log_out_success
 from server_state import AccountList, ActiveClients
 
