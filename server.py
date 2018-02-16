@@ -157,6 +157,7 @@ class AccountList(object):
     def list_accounts(self):
         return (False, "not implemented yet")
 
+
 accounts = AccountList()
 active_clients = ActiveClients()
 
@@ -169,7 +170,7 @@ active_clients = ActiveClients()
 
 def create_request(username):
     # define request creation here
-    # this is defined in clientSend now 
+    # this is defined in clientSend now
     return None
 
 
@@ -235,7 +236,7 @@ def handle_client(connection, lock, myData):
             print "ERROR: connection down"
             thread.exit()
         if len(netBuffer) >= 6:
-            header = 
+            header =
 
         # do something with the received message here
 
@@ -244,7 +245,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='[thread %(threadname)s; %(funcName)20s() %(asctime)s [%(levelname)s] %(message)s',
         filename="serverLog.log")
-    myData = dict() 
+    myData = dict()
     # next create a socket object
     s = socket.socket()
     print "Socket successfully created"

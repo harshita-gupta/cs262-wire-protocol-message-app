@@ -1,37 +1,41 @@
 # Import socket module
+import sys
 import config
 import socket
 import clientSend
 
 current_user = None
 
+
 def getStartupInput():
     print '''
 WELCOME - type the number of a function:
     (1) Create Account
-    (2) Log In 
+    (2) Log In
     '''
     startupInput = raw_input('>> ')
     return startupInput
 
+
 def processInput(requestNumber):
-    #create
+    # create
     if requestNumber == str(1):
         clientSend.create_request(sock)
-        
-    #delete
+
+    # delete
     elif requestNumber == str(2):
         clientSend.login_request(sock)
-        
+
     return
 
+
 if __name__ == '__main__':
-        
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-		sock.connect((raw_input("IP:"), config.port))
+        sock.connect((raw_input("IP:"), config.port))
     except:
-        print "ERROR: could not connect to port: " + myPort
+        print "ERROR: could not connect to port: " + config.port
         sys.exit()
 
     while True:
@@ -39,4 +43,4 @@ if __name__ == '__main__':
         processInput(startupInput)
         getResponse()
 
-    mySocket.close()
+    # mySocket.close()

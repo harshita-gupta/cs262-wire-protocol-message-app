@@ -1,7 +1,10 @@
+import thread
+
 # Define the port on which you want to connect
 port = 12345
 
-import thread
+
+
 
 def send_message(message, conn):
     try:

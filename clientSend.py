@@ -1,23 +1,25 @@
+from config import send_message
 from struct import pack
 from sys import maxint, exit
 
-#create new account
+
+# create new account
 def create_request(conn):
-    
+
     print "CREATING AN ACCOUNT \n"
     print "enter a username of alphanumeric characters under 20 characters:"
     while True:
         # ATTN remove int()
         userInput = int(raw_input('>> '))
-        if(userInput.isalnum() and len(userInput)<=20):
+        if(userInput.isalnum() and len(userInput) <= 20):
             username = userInput
             break
-    
-    send_message('\x01' + pack('!I',8) + '\x10' + pack('!II',username),conn)
-    
+
+    send_message('\x01' + pack('!I', 8) + '\x10' + pack('!II', username), conn)
+
     return
 
-#delete an existing account
+# delete an existing account
 # def delete_request(conn):
 #     print "DELETING AN ACCOUNT \n"
 #     print "enter a an account number 1-100:"
@@ -26,11 +28,11 @@ def create_request(conn):
 #             netBuffer = int(raw_input('>> '))
 #         except ValueError:
 #             continue
-        
+
 #         if(netBuffer > 0 and netBuffer <= 100):
 #             act = netBuffer
 #             break
-    
+
 #     send_message('\x01' + pack('!I',4) + '\x20' + pack('!I',act),conn)
 #     return
 
@@ -43,7 +45,7 @@ def create_request(conn):
 #             netBuffer = int(raw_input('>> '))
 #         except ValueError:
 #             continue
-        
+
 #         if(netBuffer > 0 and netBuffer <= 100):
 #             act = netBuffer
 #             break
@@ -56,7 +58,7 @@ def create_request(conn):
 #         if(netBuffer >= 0 and netBuffer < maxint):
 #             bal = netBuffer
 #             break
-        
+
 #     send_message('\x01' + pack('!I',8) + '\x30' + pack('!II',act,bal),conn)
 #     return
 
@@ -69,11 +71,11 @@ def create_request(conn):
 #             netBuffer = int(raw_input('>> '))
 #         except ValueError:
 #             continue
-        
+
 #         if(netBuffer > 0 and netBuffer <= 100):
 #             act = netBuffer
 #             break
-        
+
 #     print "enter an amount to withdraw:"
 #     while True:
 #         try:
@@ -83,7 +85,7 @@ def create_request(conn):
 #         if(netBuffer >= 0 and netBuffer < maxint):
 #             bal = netBuffer
 #             break
-        
+
 #     send_message('\x01' + pack('!I',8) + '\x40' + pack('!II',act,bal),conn)
 #     return
 
@@ -97,7 +99,7 @@ def create_request(conn):
 #             netBuffer = int(raw_input('>> '))
 #         except ValueError:
 #             continue
-        
+
 #         if(netBuffer > 0 and netBuffer <= 100):
 #             act = netBuffer
 #             break
