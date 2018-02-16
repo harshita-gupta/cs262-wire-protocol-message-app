@@ -34,6 +34,16 @@ WELCOME - type the number of a function:
     startupInput = raw_input('>> ')
     return startupInput
 
+def getSessionInput():
+    print '''
+YOU ARE LOGGED IN! - type the number of a function:
+    (1) Send a message 
+    (2) List all accounts 
+    (3) Delete your account
+    '''
+    sessionInput = raw_input('>> ')
+    return sessionInput 
+
 
 def processInput(requestNumber):
     # create
@@ -43,8 +53,6 @@ def processInput(requestNumber):
     # delete
     elif requestNumber == str(2):
         clientSend.login_request(sock)
-
-    print "done with processing input"
 
 
     return
@@ -66,16 +74,16 @@ def getResponse():
                 opcode = header[2]
                 #send packet to correct handler
                 try:
-                    opcodes[opcode](sock,retBuffer)
+                    success = opcodes[opcode](sock,retBuffer)
                 except KeyError:
                     break
+                if success == True: 
+                    return True 
+                else:
+                    return False 
             else:
-                print "not correct version"
-                break
-        else:
-            print "no buffer"
-    return
-
+                return 
+        return 
 
 if __name__ == '__main__':
 
@@ -88,7 +96,13 @@ if __name__ == '__main__':
 
     while True:
         startupInput = getStartupInput()
-        processInput(startupInput)
+        processInput(startupInput) 
+        success = getResponse() 
+        if success == True: 
+            break 
+
+    while True:
+        sessionInput = getSessionInput() 
         getResponse()
 
     # mySocket.close()
