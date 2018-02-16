@@ -6,15 +6,15 @@ from config import *
 
 def send_create_success(connection, username):
     print"sending create success"
-    connection.send('\x01' + pack('!I', 5) + '\x11' +
-                    pack(username_fmt, username))
+    send_message('\x01' + pack('!I', 5) + '\x11' +
+                    pack(username_fmt, username), connection)
     return
 
 
 def send_create_failure(connection, username, reason, lock):
     print"sending create failure"
     # TODO question for lisa: are we sending the reason right now?
-    connection.send('\x01' + pack('!I', 4) + '\x12')
+    send_message('\x01' + pack('!I', 4) + '\x12', connection) 
     return None
 
 
@@ -48,15 +48,16 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 # LOGOUT REQUEST
 def send_logout_success(connection):
     print"sending logout success"
-    connection.send('\x01' + pack('!I', 0) + '\x61')
+    send_message('\x01' + pack('!I', 0) + '\x61', connection)
     return
 def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
-    print "54"
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     with lock:
-        active_clients.log_out(username)
-    send_login_success(conn)
+        print "active: " + str(active_clients.list_active_clients())
+        print(active_clients.log_out(username))
+        print "active: " + str(active_clients.list_active_clients())
+    send_logout_success(conn)
     return
 
 # DELETE REQUEST
