@@ -139,23 +139,6 @@ def list_users_request(connection,
     return None
 
 
-# LOG OUT FUNCTIONS
-
-def log_out_success(connection):
-    return None
-
-
-def log_out(connection, buf, _, lock, accounts, active_clients, pack_fmt):
-    return None
-
-
-# LOG IN FUNCTIONS
-
-def log_in_request(connection, buf, _,
-                   lock, accounts, active_clients, pack_fmt):
-    return None
-
-
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
            '\x20': login_request,
