@@ -1,5 +1,6 @@
 import threading
 import logging
+import config
 from collections import deque
 
 ################################################
@@ -49,6 +50,12 @@ class ActiveClients(object):
         # (locks, socket objects) as values
         self.sockets = {}
 
+    def is_active(self, username):
+        with self.lock:
+            if username in self.sockets:
+                return True
+            return False
+
     def log_out(self, username):
         if not self.sockets.get(username):
             return (False, "Username not currently logged in")
@@ -61,7 +68,7 @@ class ActiveClients(object):
                     "Successfully closed connection with %s's socket",
                     username)
                 self.sockets.remove(username)
-        return True
+        return (True, "")
 
     def log_in(self, username, lock, sock, account_list):
         logging.info("Waiting to obtain lock for account list")
@@ -76,7 +83,7 @@ class ActiveClients(object):
                         False,
                         "User %s is already logged in." % username)
                 self.sockets[username] = (lock, sock)
-        return True
+        return (True, "")
 
     def list_active_clients(self):
         with self.lock:
@@ -95,6 +102,8 @@ class AccountList(object):
        associated with it.
     b. The dictionary that maps usernames to undelivered messages.
        Each username's undelivered message queue has a lock associated with it.
+       Undelivered messages are stored as packed buffers of data
+       matching the format of the x80 opcode.
     '''
 
     def __init__(self):
@@ -120,19 +129,33 @@ class AccountList(object):
                 self.accounts.add(username)
                 self.__pending_messages[username] = (threading.Lock,
                                                      deque())
-        return True
+        return (True, "")
 
-    def add_pending_message(self, sending_user, receiving_user, message):
+    def add_pending_message(self, receiving_user, packed_message):
         # list of accounts should not be modified while adding a message
         logging.info("waiting to obtain accountList")
         with self.lock:
-            if sending_user not in self.accounts:
-                return (False, "Sending user no longer exists")
             if receiving_user not in self.accounts:
                 return (False, "Receiving user no longer exists")
             with self.__pending_messages[receiving_user][0]:
-                self.__pending_messages[receiving_user].append(message)
-        return True
+                self.__pending_messages[receiving_user].append(packed_message)
+        return (True, "")
+
+    def deliver_pending_messages(self, receiving_username, lock, sock):
+        if not self.account_exists(receiving_username):
+            return (False, "account %s does not exist." % receiving_username)
+        logging.info(
+            "waiting for lock on pending messages for %s" % receiving_username)
+        with self.__pending_messages[receiving_username][0]:
+            logging.info("waiting for lock on client thread")
+            with lock:
+                dq = self.__pending_messages[receiving_username][1]
+                while dq:
+                    config.send_message(dq[0], sock)
+                    dq.popleft()
+
+        # TODO this function should be called in server_operations log_in
+        return None
 
     def delete_account(self, username, active_clients):
         logging.info("waiting to obtain accountList")
@@ -148,7 +171,14 @@ class AccountList(object):
                     return (False, mes)
                 self.accounts.remove(username)
                 self.__pending_messages.remove(username)
+                return (True, "")
+
+    def account_exists(self, username):
+        logging.info("waiting to obtain accountList")
+        with self.lock:
+            if username in self.accounts:
                 return True
+            return False
 
     def list_accounts(self):
         logging.info("waiting to obtain accountlist")
@@ -156,3 +186,23 @@ class AccountList(object):
             if not len(self.accounts):
                 return "No accounts exist!"
             return ', '.join(str(e) for e in self.accounts)
+
+
+def send_or_queue_message(accounts, active_clients, receiving_user,
+                          packed_message):
+    # If the receiving user is currently logged in,
+    # send the message immediately.
+    # Otherwise, queue it for delivery.
+    if active_clients.is_active(receiving_user):
+        lock, sock = active_clients.sockets[receiving_user]
+        logging.info("Waiting to obtain lock for %s's socket" % receiving_user)
+        with lock:
+            config.send_message(packed_message, sock)
+            # TODO check for send failure
+        return (True, "")
+
+    # receiving user is not logged in, queue for delivery
+    if not accounts.account_exists(receiving_user):
+        return (False, "Account %s does not exist." % receiving_user)
+
+    accounts.add_pending_message(receiving_user, packed_message)
