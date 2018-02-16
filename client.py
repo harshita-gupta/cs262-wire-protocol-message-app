@@ -9,7 +9,7 @@ current_user = None
 
 version = '\x01'
 
-#opcode associations; note that these opcodes will be returned by the server
+# opcode associations; note that these opcodes will be returned by the server
 opcodes = {'\x11': create_success,
            '\x12': create_failure,
            '\x61': logout_success,
@@ -33,10 +33,11 @@ WELCOME - type the number of a function:
     '''
     while True:
         startupInput = raw_input('>> ')
-        if int(startupInput)==1 or int(startupInput)==2:
+        if int(startupInput) == 1 or int(startupInput) == 2:
             break
 
     return startupInput
+
 
 def getSessionInput():
     print '''
@@ -67,31 +68,30 @@ def processInput(requestNumber):
     elif requestNumber == str(5):
         clientSend.logout_request(sock, current_user)
 
-
     return
 
+
 def getResponse():
-    #wait for server responses...
+    # wait for server responses...
     while True:
         try:
-            retBuffer = sock.recv( 1024 )
+            retBuffer = sock.recv(1024)
         except:
-            #close the client if the connection is down
+            # close the client if the connection is down
             print "ERROR: connection down"
             sys.exit()
 
         if len(retBuffer) != 0:
             header = unpack(config.pack_header_fmt, retBuffer[0:6])
-            #only allow correct version numbers
+            # only allow correct version numbers
             if header[0] == version:
                 opcode = header[2]
-                print opcode
-                #send packet to correct handler
+                # send packet to correct handler
                 try:
-                    success, info = opcodes[opcode](sock,retBuffer)
+                    success, info = opcodes[opcode](sock, retBuffer)
                 except KeyError:
                     break
-                if success == True:
+                if success:
                     # return True and username
                     return True, info
                 else:
@@ -100,8 +100,10 @@ def getResponse():
                 return
         return
 
+
 if __name__ == '__main__':
 
+    # SET UP SOCKET
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         sock.connect(('127.0.0.1', config.port))
@@ -109,20 +111,18 @@ if __name__ == '__main__':
         print "ERROR: could not connect to port: " + config.port
         sys.exit()
 
+    # PROCESS INPUT
     while True:
-        print current_user
 
         while True:
             startupInput = getStartupInput()
             processInput(startupInput)
             success, username = getResponse()
-            if success == True:
+            if success:
                 current_user = username
-                print "here"
                 break
 
         while True:
-            print current_user
             sessionInput = getSessionInput()
             processInput(sessionInput)
             getResponse()
