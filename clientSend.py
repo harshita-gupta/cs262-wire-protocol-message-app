@@ -10,7 +10,6 @@ def create_request(conn):
     print "CREATING AN ACCOUNT \n"
     print "enter a username of alphanumeric characters under 20 characters:"
     while True:
-        # ATTN remove int()
         userInput = raw_input('>> ')
         if(userInput.isalnum() and len(userInput) <= 5):
             username = userInput
@@ -20,22 +19,20 @@ def create_request(conn):
 
     return
 
-# delete an existing account
-# def delete_request(conn):
-#     print "DELETING AN ACCOUNT \n"
-#     print "enter a an account number 1-100:"
-#     while True:
-#         try:
-#             netBuffer = int(raw_input('>> '))
-#         except ValueError:
-#             continue
+# log in to an existing account
+def login_request(conn):
 
-#         if(netBuffer > 0 and netBuffer <= 100):
-#             act = netBuffer
-#             break
+    print "LOGGING IN \n"
+    print "Enter your username"
+    while True:
+        userInput = raw_input('>> ')
+        if(userInput.isalnum() and len(userInput) <= 5):
+            username = userInput
+            break
 
-#     send_message('\x01' + pack('!I',4) + '\x20' + pack('!I',act),conn)
-#     return
+    send_message('\x01' + pack('!I', 5) + '\x20' + pack(config.username_fmt, username), conn)
+
+    return
 
 # #deposit to an existing account
 # def deposit_request(conn):
