@@ -136,3 +136,6 @@ class AccountList(object):
 
     def list_accounts(self):
         return (False, "not implemented yet")
+
+    def show_accounts(self):
+        return self.__accounts

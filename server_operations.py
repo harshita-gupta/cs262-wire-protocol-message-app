@@ -45,7 +45,7 @@ def create_request(conn, netBuffer, lock, accounts, active_clients):
     #     myData[act] = bal
     #     create_success(conn, act)
     lock.release()
-    print accounts
+    print(accounts.show_accounts())
 
     return
 
