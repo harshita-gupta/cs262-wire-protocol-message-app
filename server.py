@@ -7,7 +7,7 @@ import traceback
 import thread
 import config
 import logging
-from server_operations import opcodes
+from server_operations import opcodes, send_logout_success
 from server_state import AccountList, ActiveClients
 from struct import unpack
 
@@ -61,9 +61,15 @@ def handle_client(connection, lock, accounts, active_clients):
                     traceback.print_exc()
                     print "failed"
                     if second_attempt:
+
                         # disconnect the client
-                        log_out_success(connection)
-                        connection.close()
+                        with active_clients.lock:
+                            for key, (l, s) in active_clients.sockets:
+                                if s == connection:
+                                    del active_clients.sockets[key]
+                                    break
+                        with lock:
+                            send_logout_success(connection)
                         return
                     else:
                         # send incorrect opcode message
