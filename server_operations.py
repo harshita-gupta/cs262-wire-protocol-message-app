@@ -43,7 +43,7 @@ def send_login_success(connection, username):
     return
 
 
-def send_login_failure(connection, username, reason):
+def send_login_failure(connection):
     print"sending login failure"
     send_message(
         '\x01' + pack('!I', 0) + '\x22',
@@ -53,8 +53,7 @@ def send_login_failure(connection, username, reason):
 def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    if username in accounts.accounts and username not in active_clients.sockets:
-        success, info = active_clients.log_in(username, lock, conn, accounts)
+    success, info = active_clients.log_in(username, lock, conn, accounts)
     if success == True:
         with lock: 
             send_login_success(conn, username) 
