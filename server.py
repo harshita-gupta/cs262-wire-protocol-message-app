@@ -3,6 +3,7 @@
 
 # first of all import the socket library
 import socket
+import traceback
 import thread
 import config
 import logging
@@ -57,6 +58,7 @@ def handle_client(connection, lock, accounts, active_clients):
                 # we allow one retry before the client is booted
                 # for sending useless inputs too often.
                 except:
+                    traceback.print_exc()
                     print "failed"
                     if second_attempt:
                         # disconnect the client

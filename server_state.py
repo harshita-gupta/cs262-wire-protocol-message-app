@@ -66,7 +66,8 @@ class ActiveClients(object):
                 # self.sockets[username][1].close()
                 logging.info(
                     "Successfully logged out %s's socket", username)
-                self.sockets.remove(username)
+                print self.sockets.keys()
+                del self.sockets[username]
         return (True, "")
 
     def log_in(self, username, lock, sock, account_list):

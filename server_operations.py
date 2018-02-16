@@ -15,18 +15,19 @@ def send_create_success(connection, username):
 def send_create_failure(connection, username, reason):
     print"sending create failure"
     # TODO question for lisa: are we sending the reason right now?
-    send_message('\x01' + pack('!I', 4) + '\x12', connection)
+    send_message(
+        '\x01' + pack('!I', len(reason)) + '\x12' +
+        pack(request_body_fmt['\x12'], reason),
+        connection)
     return None
 
 
 def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
+    success, error = accounts.add_account(username)
     with lock:
-        success, error = accounts.add_account(username)
         if success:
-            # QUESTION: do we want to automatically log a user in when
-            # they create an account?
             active_clients.log_in(username, lock, conn, accounts)
             send_create_success(conn, username)
         else:
@@ -63,14 +64,14 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     print "active: " + str(active_clients.list_active_clients())
-    with lock: 
-        print "obtained lock"
-        success, error = active_clients.log_out(username)
-        print "success" + str(success) 
-        print "active: " + str(active_clients.list_active_clients())
+    print "obtained lock"
+    success, error = active_clients.log_out(username)
+    print "success" + str(success)
+    print "active: " + str(active_clients.list_active_clients())
     # NOTE TO LISA: there is a case in which active_clients.log_out will
     # return failure, i.e. if the user is already logged out --
     # we should accmodate for this i think?
+    with lock:
         send_logout_success(conn)
     return
 
