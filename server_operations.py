@@ -36,17 +36,31 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 # LOGIN REQUEST
 
+def send_login_success(connection, username):
+    print"sending login success"
+    send_message('\x01' + pack('!I', 5) + '\x21' +
+                 pack(username_fmt, username), connection)
+    return
+
+
+def send_login_failure(connection, username, reason):
+    print"sending login failure"
+    send_message(
+        '\x01' + pack('!I', 0) + '\x22',
+        connection)
+    return None
+
 def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    with lock:
-        if username in accounts.accounts and username not in active_clients.sockets:
-            print "login ok"
-        # if success:
-        #     send_create_success(conn, username)
-        #     active_clients.log_in(username, lock, conn, accounts)
-        # else:
-        #     send_create_failure(conn, username, success[1])
+    if username in accounts.accounts and username not in active_clients.sockets:
+        success, info = active_clients.log_in(username, lock, conn, accounts)
+    if success == True:
+        with lock: 
+            send_login_success(conn, username) 
+    else:
+        with lock: 
+            send_login_failure(conn)
     return
 
 

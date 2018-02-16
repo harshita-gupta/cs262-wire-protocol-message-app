@@ -34,7 +34,6 @@ def login_request(conn):
 
     send_message('\x01' + pack('!I', 5) + '\x20' +
                  pack(config.username_fmt, username), conn)
-
     return
 
 

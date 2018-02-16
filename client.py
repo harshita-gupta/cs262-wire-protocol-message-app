@@ -12,6 +12,8 @@ version = '\x01'
 # opcode associations; note that these opcodes will be returned by the server
 opcodes = {'\x11': create_success,
            '\x12': create_failure,
+           '\x21': login_success,
+           '\x22': login_failure,
            '\x61': logout_success,
            # '\x22': general_failure,
            # '\x31': deposit_success,
