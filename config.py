@@ -63,8 +63,7 @@ logging_fmt = ('[thread %(threadname)s;'
 
 
 logging.basicConfig(
-    format=logging_fmt,
-    filename="serverLog.log")
+    format=logging_fmt)
 
 
 def send_message(message, conn):
