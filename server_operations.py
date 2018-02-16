@@ -12,8 +12,9 @@ def send_create_success(connection, username):
     return
 
 
-def send_create_failure(connection, username, reason):
+def send_create_failure(connection, username, reason, lock):
     print"sending create failure"
+    # TODO question for lisa: are we sending the reason right now?
     connection.send('\x01' + pack('!I', 4) + '\x12')
     return None
 
@@ -21,15 +22,13 @@ def send_create_failure(connection, username, reason):
 def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    lock.acquire()
-    success = accounts.add_account(username)
-    if success:
-        send_create_success(connection, username)
-        active_clients.log_in(username, connection, accounts)
-    else:
-        send_create_failure(connection, username, success[1])
-
-    lock.release()
+    with lock:
+        success = accounts.add_account(username)
+        if success:
+            send_create_success(connection, username)
+            active_clients.log_in(username, lock, connection, accounts)
+        else:
+            send_create_failure(connection, username, success[1])
     return
 
 

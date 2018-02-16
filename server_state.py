@@ -63,7 +63,7 @@ class ActiveClients(object):
                 self.sockets[username] = None
         return True
 
-    def log_in(self, username, sock, account_list):
+    def log_in(self, username, lock, sock, account_list):
         logging.info("Waiting to obtain lock for account list")
         with account_list.lock:
             if username not in account_list.accounts:
@@ -75,7 +75,7 @@ class ActiveClients(object):
                     return (
                         False,
                         "User %s is already logged in." % username)
-                self.sockets[username] = (threading.Lock(), sock)
+                self.sockets[username] = (lock, sock)
         return True
 
 
