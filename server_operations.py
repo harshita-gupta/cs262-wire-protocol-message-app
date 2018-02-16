@@ -6,7 +6,8 @@ from config import *
 
 def send_create_success(connection, username):
   print"sending create success"
-  connection.send('\x01' + pack('!I',5) +'\x11' + pack(config.username_fmt, username))
+  print username 
+  connection.send('\x01' + pack('!I',5) +'\x11' + pack(username_fmt, username))
   return
 
 
