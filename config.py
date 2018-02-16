@@ -49,11 +49,11 @@ request_body_fmt = {
     # must format these with length of reason string
     ########
 
-    # send message request, must format with length of message string
-    '\x30': username_fmt + "%is%is" % username_length,
+    # # send message request, must format with length of message string
+    # '\x30': username_fmt + "%is%is" % username_length,
 
-    # deliver message request, must format with length of message string
-    '\x80': username_fmt + "%is%is" % username_length
+    # # deliver message request, must format with length of message string
+    # '\x80': username_fmt + "%is%is" % username_length
 
 }
 
