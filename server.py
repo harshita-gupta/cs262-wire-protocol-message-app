@@ -5,9 +5,7 @@
 import socket
 import thread
 import config
-# import threading
 import logging
-# from collections import deque
 from server_operations import opcodes, log_out_success
 from server_state import AccountList, ActiveClients
 from struct import unpack
@@ -54,7 +52,8 @@ def handle_client(connection, lock, accounts, active_clients):
                 try:
                     print "here"
                     opcodes[opcode](
-                        connection, netBuffer, lock, accounts, active_clients)
+                        connection, netBuffer, lock, accounts, active_clients,
+                        config.request_body_fmt[opcode])
 
                 # catch unhandled opcodes
                 # we allow one retry before the client is booted

@@ -98,7 +98,7 @@ class AccountList(object):
         self.lock = threading.Lock()
 
         # list of all valid usernames
-        self.__accounts = []
+        self.__accounts = set()
 
         # dictionary with usernames as keys
         # values are tuples of
@@ -114,7 +114,7 @@ class AccountList(object):
             if username in self.__accounts:
                 return (False, "Username already exists.")
             else:
-                self.__accounts.append(username)
+                self.__accounts.add(username)
                 self.__pending_messages[username] = (threading.Lock,
                                                      deque())
         return True
@@ -131,11 +131,18 @@ class AccountList(object):
                 self.__pending_messages[receiving_user].append(message)
         return True
 
-    def delete_account(self, username):
-        return (False, "Not implemented yet")
-
-    def list_accounts(self):
-        return (False, "not implemented yet")
-
-    def show_accounts(self):
-        return self.__accounts
+    def delete_account(self, username, active_clients):
+        logging.info("waiting to obtain accountList")
+        with self.lock:
+            if username not in self.__accounts:
+                return (False, "username does not exist.")
+            logging.info("Waiting to obtain pending info list")
+            with self.__pending_messages[username][0]:
+                if len(self.__pending_messages[username][1]):
+                    mes = ("Messages still pending delivery to %s. "
+                           "Cannot delete account until user logs in." %
+                           username)
+                    return (False, mes)
+                self.__accounts.remove(username)
+                self.__pending_messages.remove(username)
+                return True

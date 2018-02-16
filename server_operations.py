@@ -1,6 +1,7 @@
 import config
 from struct import unpack
 
+<<<<<<< HEAD
 
 # added the below functions as skeleton code mostly so that we could
 # nicely link to them in the dict of opcodes,
@@ -49,6 +50,9 @@ def create_request(conn, netBuffer, lock, accounts, active_clients):
 
     return
 
+=======
+# CREATE REQUEST
+>>>>>>> d3272c825b3397ff111bffd562dd8daf241c663d
 
 def send_create_success(username):
 
@@ -59,9 +63,16 @@ def send_create_failure(username, reason):
     return None
 
 
-def delete_request(username):
+def create_request(connection, buf, lock, accounts, active_clients, pack_fmt):
+    values = unpack(pack_fmt, buf[6:14])
+
+    lock.acquire()
+    accounts.add_account(values[0])
+
     return None
 
+
+# DELETE REQUEST
 
 def send_delete_success(username):
     return None
@@ -71,8 +82,11 @@ def send_delete_failure(username, reason):
     return None
 
 
-def send_message_request(sending_user, receiving_user, message):
+def delete_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
+
+
+# SEND MESSAGE REQUEST
 
 
 def send_message_failure(reason):
@@ -83,15 +97,19 @@ def send_message_success():
     return None
 
 
-def list_users_request():
+def send_message_request(connection,
+                         buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
-def send_list_users_success():
+# LIST USERS FUNCTIONS
+
+def send_list_users():
     return None
 
 
-def send_list_users_failure():
+def list_users_request(connection,
+                       buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
@@ -101,13 +119,13 @@ def log_out_success(connection):
     return None
 
 
-def log_out():
+def log_out(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
 # LOG IN FUNCTIONS
 
-def log_in_request():
+def log_in_request(connection, buf, lock, accounts, active_clients, pack_fmt):
     return None
 
 
