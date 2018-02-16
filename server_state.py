@@ -63,10 +63,9 @@ class ActiveClients(object):
         with self.lock:
             logging.info("waiting to obtain lock for socket for %s", username)
             with self.sockets[username][0]:
-                self.sockets[username][1].close()
+                # self.sockets[username][1].close()
                 logging.info(
-                    "Successfully closed connection with %s's socket",
-                    username)
+                    "Successfully logged out %s's socket", username)
                 self.sockets.remove(username)
         return (True, "")
 
