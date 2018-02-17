@@ -17,7 +17,7 @@ def create_failure(conn, netBuffer):
 def login_success(conn, netBuffer):
     values = unpack(username_fmt, netBuffer[6:14])
     current_user = values[0]
-    print "\nAccount creation successful"
+    print "\nLog in successful"
     return True, current_user
 
 
@@ -35,13 +35,16 @@ def delete_success(conn, netBuffer):
     print "\nSuccessfully deleted account"
     return True, ""
 
+
 def delete_failure(conn, netBuffer):
     print "\nCannot delete account because of pending messages or account does not exist"
     return True, ""
 
+
 def list_success(conn, netBuffer):
     print "\nAccounts to be listed here"
     return True, ""
+
 
 def send_message_success(conn, netBuffer):
     values = unpack(username_fmt, netBuffer[6:14])
