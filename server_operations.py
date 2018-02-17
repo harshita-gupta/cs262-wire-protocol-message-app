@@ -1,6 +1,6 @@
 from struct import unpack, pack
 from config import *
-# from server_state import send_or_queue_message
+from server_state import send_or_queue_message
 
 # CREATE REQUEST
 
@@ -56,10 +56,10 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     print active_clients.list_active_clients()
     success, info = active_clients.log_in(username, lock, conn, accounts)
     if success == True:
-        with lock: 
-            send_login_success(conn, username) 
+        with lock:
+            send_login_success(conn, username)
     else:
-        with lock: 
+        with lock:
             send_login_failure(conn)
     return
 
@@ -98,14 +98,14 @@ def send_delete_failure(conn, reason):
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    if username in active_clients.sockets: 
+    if username in active_clients.sockets:
         active_clients.log_out(username)
     success, reason = accounts.delete_account(username)
-    if success == True: 
+    if success == True:
         with lock:
             send_delete_success(conn)
     else:
-        with lock: 
+        with lock:
             send_delete_failure(conn, reason)
     return
 
@@ -121,7 +121,7 @@ def send_list_success(conn, accounts):
 def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     accounts = accounts.list_accounts()
     print accounts
-    with lock: 
+    with lock:
             send_list_success(conn, accounts)
     return
 
@@ -141,11 +141,9 @@ def send_message_success(connection):
 
 def send_message_request(connection, buf, payload_len,
                          lock, accounts, active_clients, pack_fmt):
-    deliver_header = unpack(pack_header_fmt, netBuffer[0:6])
-    deliver_header[3] = '\x80'
-
-    pack_fmt = pack_fmt % payload_len - (2 * username_length)
-    receiving_user = unpack(pack_fmt, buf[6:payload_len + 6])[2]
+    header = unpack(pack_header_fmt, buf[:6])
+    pack_fmt = pack_fmt % (payload_len - (2 * username_length))
+    receiving_user = unpack(pack_fmt, buf[6:payload_len + 6])[1]
 
     success, error = send_or_queue_message(
         accounts, active_clients, receiving_user,
@@ -153,7 +151,8 @@ def send_message_request(connection, buf, payload_len,
         # send_or_queue accepts a packed package of what should be
         # delivered to the client.
         # this is the same as what was received, with a changed op code.
-        pack(pack_header_fmt, deliver_header) + buf[6:payload_len + 6])
+        pack(pack_header_fmt, header[0], header[1], '\x80') +
+        buf[6:payload_len + 6])
 
     with lock:
         if success:
@@ -180,6 +179,7 @@ opcodes = {'\x10': create_request,
            '\x20': login_request,
            '\x50': list_request,
            '\x60': logout_request,
-           '\x70': delete_request}
+           '\x70': delete_request,
+           '\x30': send_message_request}
            # '\x30': send_message_request,
            # '\x50': list_users_request,

@@ -48,22 +48,24 @@ def logout_request(conn, username):
 
 # delete
 def delete_request(conn, username):
-    if username != None: 
+    if username is None:
         print "\nDELETING YOUR ACCOUNT \n"
         send_message('\x01' + pack('!I', 5) + '\x70' +
                      pack(config.username_fmt, username), conn)
     else:
-        username = raw_input('Enter the username of the account to be deleted: ')
+        username = raw_input(
+            'Enter the username of the account to be deleted: ')
         send_message('\x01' + pack('!I', 5) + '\x70' +
                      pack(config.username_fmt, username), conn)
 
     return
 
+
 # list
 def list_request(conn):
     print "\nLISTING ALL ACCOUNTS \n"
     send_message('\x01' + pack('!I', 5) + '\x50' +
-        pack(config.username_fmt, ""), conn)
+                 pack(config.username_fmt, ""), conn)
 
     return
 
@@ -81,12 +83,15 @@ def send_message_request(sock, current_user):
 
     print "Enter the message you'd like to send to this user."
     message = raw_input()
-    send_message('\x01' +
-                 pack('!I', (2 * config.username_length) + len(message)) +
-                 '\x30' +
-                 pack(config.request_body_fmt['\x30'] % len(message), message),
+    payload_len = (2 * config.username_length) + len(message)
+    print payload_len
+    fmt_str = config.request_body_fmt['\x30'] % len(message)
+    print fmt_str
+    head_str = '\x01' + pack('!I', payload_len) + '\x30'
+    send_message(head_str +
+                 pack(fmt_str,
+                      current_user, receiving_user, message),
                  sock)
-    # send message!
 
 
 # message delivery
