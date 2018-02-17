@@ -1,7 +1,5 @@
 from struct import unpack, pack
-import config
 from config import *
-import config
 from server_state import send_or_queue_message
 
 # CREATE REQUEST
@@ -18,7 +16,7 @@ def send_create_failure(connection, username, reason):
     print"sending create failure"
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x12' +
-        pack(config.request_body_fmt['\x12'] % len(reason), reason),
+        pack(request_body_fmt['\x12'] % len(reason), reason),
         connection)
     return None
 
@@ -49,7 +47,7 @@ def send_login_failure(connection, reason):
     print"sending login failure"
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x22' +
-        pack(config.request_body_fmt['\x22'] % len(reason), reason),
+        pack(request_body_fmt['\x22'] % len(reason), reason),
         connection)
     return None
 
@@ -62,6 +60,10 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     if success:
         with lock:
             send_login_success(conn, username)
+        dsuccess, dinfo = accounts.deliver_pending_messages(
+            username, lock, conn)
+        if not dsuccess:
+            print "Delivery of pending messages failed", dinfo
     else:
         with lock:
             send_login_failure(conn, info)
@@ -120,7 +122,7 @@ def send_list_success(conn, accounts):
     logging.info("sending list success")
     send_message(
         '\x01' + pack('!I', len(accounts)) + '\x51' +
-        pack(config.request_body_fmt['\x51'] % len(accounts), accounts), conn)
+        pack(request_body_fmt['\x51'] % len(accounts), accounts), conn)
     return
 
 
@@ -139,7 +141,7 @@ def send_message_failure(connection, reason):
     print "Sending failure of send message operation"
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x32' +
-        pack(config.request_body_fmt['\x32'] % len(reason), reason), conn)
+        pack(request_body_fmt['\x32'] % len(reason), reason), conn)
     return None
 
 
@@ -197,6 +199,6 @@ opcodes = {'\x10': create_request,
            '\x60': logout_request,
            '\x70': delete_request,
            '\x30': send_message_request,
-           # '\x81': deliver_message_success,
-           # '\x82': deliver_message_failure
+           '\x81': deliver_message_success,
+           '\x82': deliver_message_failure
            }

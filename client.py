@@ -181,6 +181,7 @@ if __name__ == '__main__':
         # Get the list sockets which are readable
         read_sockets, write_sockets, error_sockets = select.select(
             socket_list, [], [])
+        print read_sockets
 
         for s in read_sockets:
 
@@ -211,12 +212,11 @@ if __name__ == '__main__':
             # transaction between the client and server for a given operation
             # is complete.
             else:
-                while True:
-                    sessionInput = getSessionInput()
-                    processInput(sessionInput)
-                    getResponse()
-                    if int(sessionInput) == 3 or int(sessionInput) == 6:
-                        current_user = None
-                        current_user = require_log_in()
+                sessionInput = getSessionInput()
+                processInput(sessionInput)
+                getResponse()
+                if int(sessionInput) == 3 or int(sessionInput) == 6:
+                    current_user = None
+                    current_user = require_log_in()
 
     # mySocket.close()

@@ -1,6 +1,9 @@
 import threading
 import logging
+import thread
+from struct import unpack
 import config
+from clientReceive import reason_string
 from collections import deque
 
 ################################################
@@ -20,6 +23,23 @@ AccountList classes. The instance variables of these classes should not be
 directly accessed, but instead object methods should be invoked to make
 state modifications.
 '''
+
+
+def get_client_message(connection):
+    try:
+        netBuffer = connection.recv(1024)
+    except:
+        print "ERROR: connection down"
+        thread.exit()
+
+    if len(netBuffer) < 6:
+        return None
+
+    # unpack the header of the message, i.e.
+    # version number, payload length, op code
+    # therefore !cIc
+    header = unpack(config.pack_header_fmt, netBuffer[0:6])
+    return header[0], header[1], header[2], netBuffer
 
 
 class ActiveClients(object):
@@ -151,11 +171,17 @@ class AccountList(object):
                 dq = self.__pending_messages[receiving_username][1]
                 while dq:
                     config.send_message(dq[0], sock)
-                    # recv confirmation that message was delivered
+                    client_message = get_client_message(sock)
+                    if not client_message:
+                        print "connection with client dropped"
+                        thread.exit()
+                    _, payload_len, opcode, buf = client_message
+
+                    if opcode != '\x81':
+                        return (False, "Delivery failed." + reason_string(buf))
                     dq.popleft()
 
-        # TODO this function should be called in server_operations log_in
-        return None
+        return True, ""
 
     def delete_account(self, username):
         logging.info("waiting to obtain accountList")
@@ -205,4 +231,4 @@ def send_or_queue_message(accounts, active_clients, receiving_user,
     if not accounts.account_exists(receiving_user):
         return (False, "Account %s does not exist." % receiving_user)
 
-    accounts.add_pending_message(receiving_user, packed_message)
+    return accounts.add_pending_message(receiving_user, packed_message)

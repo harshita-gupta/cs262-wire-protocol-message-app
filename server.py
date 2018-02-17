@@ -27,60 +27,70 @@ def recordConnect(addr):
     logging.flush()
 
 
+def get_client_message(connection):
+    try:
+        netBuffer = connection.recv(1024)
+    except:
+        print "ERROR: connection down"
+        thread.exit()
+
+    if len(netBuffer) < 6:
+        return None
+
+    # unpack the header of the message, i.e.
+    # version number, payload length, op code
+    # therefore !cIc
+    header = unpack(config.pack_header_fmt, netBuffer[0:6])
+    return header[0], header[1], header[2], netBuffer
+
+
 # threaded method for handling an individual client
 def handle_client(connection, lock, accounts, active_clients):
     # keep track of erroneous opcodes
     second_attempt = 0
     while True:
-        try:
-            netBuffer = connection.recv(1024)
-        except:
-            print "ERROR: connection down"
-            thread.exit()
-        if len(netBuffer) >= 6:
-            # unpack the header of the message, i.e.
-            # version number, payload length, op code
-            # therefore !cIc
-            header = unpack(config.pack_header_fmt, netBuffer[0:6])
-            print header
 
-            # only allow correct version numbers and
-            # buffers that are of the appropriate length
-            sent_version = header[0]
-            payload_len = header[1]
-            if sent_version == version and len(netBuffer) == payload_len + 6:
-                opcode = header[2]
-                # try to send packet to correct handler
-                try:
-                    print opcodes[opcode]
-                    opcodes[opcode](
-                        connection, netBuffer, payload_len, lock, accounts,
-                        active_clients, config.request_body_fmt[opcode])
+        client_message = get_client_message(connection)
+        if not client_message:
+            continue
 
-                # catch unhandled opcodes
-                # we allow one retry before the client is booted
-                # for sending useless inputs too often.
-                except:
-                    traceback.print_exc()
-                    if second_attempt:
+        recv_version, payload_len, opcode, netBuffer = client_message
 
-                        # disconnect the client
-                        with active_clients.lock:
-                            for key, (l, s) in active_clients.sockets:
-                                if s == connection:
-                                    del active_clients.sockets[key]
-                                    break
-                        with lock:
-                            send_logout_success(connection)
-                        return
-                    else:
-                        # send incorrect opcode message
-                        second_attempt = 1
-                        unknown_opcode(connection)
-            else:
-                # TODO can potentially check to make sure that
-                # there is no pending delivery waiting in socket
-                continue
+        # only allow correct version numbers and
+        # buffers that are of the appropriate length
+        if recv_version == version and len(netBuffer) == payload_len + 6:
+
+            # try to send packet to correct handler
+            try:
+                print opcodes[opcode]
+                opcodes[opcode](
+                    connection, netBuffer, payload_len, lock, accounts,
+                    active_clients, config.request_body_fmt[opcode])
+
+            # catch unhandled opcodes
+            # we allow one retry before the client is booted
+            # for sending useless inputs too often.
+            except:
+                traceback.print_exc()
+                if second_attempt:
+
+                    # disconnect the client
+                    with active_clients.lock:
+                        for key, (l, s) in active_clients.sockets:
+                            if s == connection:
+                                del active_clients.sockets[key]
+                                break
+                    with lock:
+                        send_logout_success(connection)
+                    return
+                else:
+                    # send incorrect opcode message
+                    second_attempt = 1
+                    unknown_opcode(connection)
+        else:
+            # TODO can potentially check to make sure that
+            # there is no pending delivery waiting in socket
+            continue
 
 
 if __name__ == '__main__':
