@@ -84,21 +84,27 @@ def processInput(requestNumber):
     return
 
 
+def get_server_message():
+    try:
+        retBuffer = sock.recv(1024)
+    except:
+        # close the client if the connection is down
+        print "ERROR: connection down"
+        sys.exit()
+
+    if not retBuffer:
+        print "ERROR: connection down"
+        sys.exit()
+
+    header = unpack(config.pack_header_fmt, retBuffer[0:6])
+
+    return header, retBuffer
+
+
 def getResponse():
     # wait for server responses...
     while True:
-        try:
-            retBuffer = sock.recv(1024)
-        except:
-            # close the client if the connection is down
-            print "ERROR: connection down"
-            sys.exit()
-
-        if not retBuffer:
-            print "ERROR: connection down"
-            sys.exit()
-
-        header = unpack(config.pack_header_fmt, retBuffer[0:6])
+        header, buf = get_server_message()
 
         # only allow correct version numbers
         if header[0] != version:
@@ -108,7 +114,7 @@ def getResponse():
         opcode = header[2]
 
         try:
-            success, info = opcodes[opcode](sock, retBuffer)
+            success, info = opcodes[opcode](sock, buf)
         except KeyError:
             break
 
@@ -127,6 +133,11 @@ def require_log_in():
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(
+        format=logging_fmt,
+        filename="clientLog.log")
+
 
     # SET UP SOCKET
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -151,12 +162,33 @@ if __name__ == '__main__':
             socket_list, [], [])
 
         for s in read_sockets:
-            # incoming message from remote server
-            if s == sock:
-                # deal w that shit
-                data = sock.getResponse()
 
-            # user entered a message
+            # Incoming message from remote server
+            if s == sock:
+                header, retbuf = get_server_message()
+                if header[2] != '\x80':
+                    logging.info(("received server message with unexpected"
+                                  "op code, ignoring."))
+                    continue
+                message_len = header[1] - (2 * username_length)
+                values = unpack(config.request_body_fmt['\x80'] % message_len,
+                                retbuf)
+                if values[1] != current_user:
+                    clientSend.deliver_request_failure(
+                        sock,
+                        "Message intended for %s. %s is currently logged in" %
+                        values[1], current_user)
+                else:
+                    print "Message from %s: %s" % values[0], values[3]
+                    clientSend.deliver_request_success(conn, current_user)
+
+            # User entered a message.
+            # We stay within this block until the message is processed
+            # by the server and we receive a success or failure message from
+            # the server.
+            # Therefore, no chat messages will deliver until the entire
+            # transaction between the client and server for a given operation
+            # is complete.
             else:
                 while True:
                     sessionInput = getSessionInput()
