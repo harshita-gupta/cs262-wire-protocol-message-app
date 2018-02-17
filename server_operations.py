@@ -162,18 +162,6 @@ def send_message_request(connection, buf, payload_len,
 
     return None
 
-
-# LIST USERS FUNCTIONS
-
-def send_list_users():
-    return None
-
-
-def list_users_request(connection,
-                       buf, _, lock, accounts, active_clients, pack_fmt):
-    return None
-
-
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
            '\x20': login_request,
@@ -182,4 +170,3 @@ opcodes = {'\x10': create_request,
            '\x70': delete_request,
            '\x30': send_message_request}
            # '\x30': send_message_request,
-           # '\x50': list_users_request,
