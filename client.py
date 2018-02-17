@@ -69,6 +69,9 @@ def processInput(requestNumber):
     if requestNumber == str(1):
         clientSend.create_request(sock)
 
+    elif requestNumber == str(3):
+        clientSent.send_message_request(sock, current_user)
+
     # login
     elif requestNumber == str(2):
         clientSend.login_request(sock)

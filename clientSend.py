@@ -8,10 +8,10 @@ from sys import maxint, exit
 def create_request(conn):
 
     print "CREATING AN ACCOUNT \n"
-    print "enter a username of alphanumeric characters under 20 characters:"
+    print "enter a an alphanumeric username five characters long:"
     while True:
         userInput = raw_input('>> ')
-        if(userInput.isalnum() and len(userInput) <= 5):
+        if(userInput.isalnum() and len(userInput) == 5):
             username = userInput
             break
 
@@ -45,6 +45,7 @@ def logout_request(conn, username):
 
     return
 
+
 # delete
 def delete_request(conn, username):
     print "DELETING YOUR ACCOUNT \n"
@@ -52,6 +53,24 @@ def delete_request(conn, username):
                  pack(config.username_fmt, username), conn)
 
     return
+
+# message sending
+def send_message_request(sock, current_user):
+    while True:
+        print '''
+        Enter the username of the user who you would like to send a
+        message to. Usernames are five characters long.
+        '''
+        receiving_user = raw_input()
+        if len(receiving_user) == 5:
+            break
+
+    print "Enter the message you'd like to send to this user."
+    _message = raw_input()
+
+    # send message!
+
+
 
 # message delivery
 def deliver_request_success(conn, username):
