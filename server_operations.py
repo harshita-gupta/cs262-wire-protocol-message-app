@@ -83,23 +83,29 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 # DELETE REQUEST
 
-def send_delete_success(connection):
+def send_delete_success(conn):
     print"sending delete success"
-    send_message('\x01' + pack('!I', 0) + '\x71', connection)
+    send_message('\x01' + pack('!I', 0) + '\x71', conn)
     return
 
 
-def send_delete_failure(username, reason):
-    return None
+def send_delete_failure(conn, reason):
+    print"sending delete failure"
+    send_message('\x01' + pack('!I', 0) + '\x72', conn)
 
 
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    active_clients.log_out(username)
-    accounts.delete_account(username)
-    with lock:
-        send_delete_success(conn)
+    if username in active_clients.sockets: 
+        active_clients.log_out(username)
+    success, reason = accounts.delete_account(username)
+    if success == True: 
+        with lock:
+            send_delete_success(conn)
+    else:
+        with lock: 
+            send_delete_failure(conn, reason)
     return
 
 

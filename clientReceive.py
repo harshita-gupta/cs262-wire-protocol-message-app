@@ -35,6 +35,10 @@ def delete_success(conn, netBuffer):
     print "Successfully deleted account"
     return True, ""
 
+def delete_failure(conn, netBuffer):
+    print "Cannot delete account because of pending messages or account does not exist"
+    return True, ""
+
 
 def send_message_success(conn, netBuffer):
     values = unpack(username_fmt, netBuffer[6:14])

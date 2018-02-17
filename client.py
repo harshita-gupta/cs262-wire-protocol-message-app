@@ -17,6 +17,7 @@ opcodes = {'\x11': create_success,
            '\x22': login_failure,
            '\x61': logout_success,
            '\x71': delete_success,
+           '\x72': delete_failure,
            '\x31': send_message_success,
            '\x32': send_message_failure
            # '\x22': general_failure,
@@ -34,12 +35,13 @@ opcodes = {'\x11': create_success,
 def getStartupInput():
     print '''
 WELCOME - type the number of a function:
-    (1) Create Account
-    (2) Log In
+    (1) Create account
+    (2) Log in
+    (6) Delete an account 
     '''
     while True:
         startupInput = raw_input('>> ')
-        if int(startupInput) == 1 or int(startupInput) == 2:
+        if int(startupInput) == 1 or int(startupInput) == 2 or int(startupInput) == 6:
             break
 
     return startupInput
@@ -129,12 +131,19 @@ def getResponse():
 def require_log_in():
     while True:
         startupInput = getStartupInput()
-        processInput(startupInput)
-        success, username = getResponse()
-        if success:
-            return username
-        else:
-            print username
+
+        # if creating account or logging in 
+        if int(startupInput) == 1 or int(startupInput) == 2: 
+            processInput(startupInput)
+            success, username = getResponse()
+            if success:
+                return username
+            else:
+                print username
+        else: 
+            processInput(startupInput)
+            getResponse() 
+
 
 
 if __name__ == '__main__':
@@ -154,6 +163,7 @@ if __name__ == '__main__':
 
     # UPON LAUNCHING THE PROGRAM, USER MUST LOG IN OR
     # CREATE AN ACCOUNT
+    current_user = None
     current_user = require_log_in()
 
     prompt_for_session_input()
@@ -200,6 +210,7 @@ if __name__ == '__main__':
                     processInput(sessionInput)
                     getResponse()
                     if int(sessionInput) == 5 or int(sessionInput) == 6:
+                        current_user = None 
                         current_user = require_log_in()
 
     # mySocket.close()
