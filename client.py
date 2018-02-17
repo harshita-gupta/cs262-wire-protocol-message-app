@@ -195,15 +195,15 @@ if __name__ == '__main__':
                     continue
                 message_len = header[1] - (2 * username_length)
                 values = unpack(config.request_body_fmt['\x80'] % message_len,
-                                retbuf[6:6+header[1]])
+                                retbuf[6:6 + header[1]])
                 if values[1] != current_user:
                     clientSend.deliver_request_failure(
                         sock,
                         "Message intended for %s. %s is currently logged in" %
-                        values[1], current_user)
+                        (values[1], current_user))
                 else:
-                    print "Message from %s: %s" % values[0], values[3]
-                    clientSend.deliver_request_success(conn, current_user)
+                    print "Message from %s: %s" % (values[0], values[2])
+                    clientSend.deliver_request_success(sock, current_user)
 
             # User entered a message.
             # We stay within this block until the message is processed
