@@ -48,7 +48,6 @@ def handle_client(connection, lock, accounts, active_clients):
             payload_len = header[1]
             if sent_version == version and len(netBuffer) == payload_len + 6:
                 opcode = header[2]
-                print header
                 # try to send packet to correct handler
                 try:
                     opcodes[opcode](
@@ -60,7 +59,6 @@ def handle_client(connection, lock, accounts, active_clients):
                 # for sending useless inputs too often.
                 except:
                     traceback.print_exc()
-                    print "failed"
                     if second_attempt:
 
                         # disconnect the client

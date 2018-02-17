@@ -7,7 +7,7 @@ from sys import maxint, exit
 # create new account
 def create_request(conn):
 
-    print "CREATING AN ACCOUNT \n"
+    print "\nCREATING AN ACCOUNT \n"
     print "enter a an alphanumeric username five characters long:"
     while True:
         userInput = raw_input('>> ')
@@ -24,7 +24,7 @@ def create_request(conn):
 # log in to an existing account
 def login_request(conn):
 
-    print "LOGGING IN \n"
+    print "\nLOGGING IN \n"
     print "Enter your username"
     while True:
         userInput = raw_input('>> ')
@@ -39,7 +39,7 @@ def login_request(conn):
 
 # log out
 def logout_request(conn, username):
-    print "LOGGING OUT \n"
+    print "\nLOGGING OUT \n"
     send_message('\x01' + pack('!I', 5) + '\x60' +
                  pack(config.username_fmt, username), conn)
 
@@ -49,7 +49,7 @@ def logout_request(conn, username):
 # delete
 def delete_request(conn, username):
     if username != None: 
-        print "DELETING YOUR ACCOUNT \n"
+        print "\nDELETING YOUR ACCOUNT \n"
         send_message('\x01' + pack('!I', 5) + '\x70' +
                      pack(config.username_fmt, username), conn)
     else:
@@ -61,7 +61,7 @@ def delete_request(conn, username):
 
 # list
 def list_request(conn):
-    print "LISTING ALL ACCOUNTS \n"
+    print "\nLISTING ALL ACCOUNTS \n"
     send_message('\x01' + pack('!I', 5) + '\x50' +
         pack(config.username_fmt, ""), conn)
 

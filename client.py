@@ -38,12 +38,12 @@ def getStartupInput():
 WELCOME - type the number of a function:
     (1) Create account
     (2) Log in
-    (6) Delete an account 
-    (7) List all accounts 
+    (3) Delete an account
+    (4) List all accounts 
     '''
     while True:
         startupInput = raw_input('>> ')
-        if int(startupInput) == 1 or int(startupInput) == 2 or int(startupInput) == 6 or int(startupInput) == 7:
+        if int(startupInput) > 0 and int(startupInput) < 5:            
             break
 
     return startupInput
@@ -52,11 +52,10 @@ WELCOME - type the number of a function:
 def prompt_for_session_input():
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
-    (3) Send a message
+    (3) Delete your account 
     (4) List all accounts
-    (5) Log out
-    (6) Delete your account
-    (7) List all accounts 
+    (5) Send a message
+    (6) Log out 
     '''
     sys.stdout.flush()
 
@@ -65,7 +64,7 @@ def getSessionInput():
     prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
-        if int(sessionInput) > 2 and int(sessionInput) < 8:
+        if int(sessionInput) > 2 and int(sessionInput) < 7:
             break
 
     return sessionInput
@@ -76,24 +75,25 @@ def processInput(requestNumber):
     if requestNumber == str(1):
         clientSend.create_request(sock)
 
-    elif requestNumber == str(3):
-        clientSend.send_message_request(sock, current_user)
-
     # login
     elif requestNumber == str(2):
         clientSend.login_request(sock)
 
-    # logout
-    elif requestNumber == str(5):
-        clientSend.logout_request(sock, current_user)
-
     # delete
-    elif requestNumber == str(6):
+    elif requestNumber == str(3):
         clientSend.delete_request(sock, current_user)
 
     # list 
-    elif requestNumber == str(7):
+    elif requestNumber == str(4):
         clientSend.list_request(sock)
+
+    # message 
+    elif requestNumber == str(5):
+        clientSend.send_message_request(sock, current_user)
+
+    # logout
+    elif requestNumber == str(6):
+        clientSend.logout_request(sock, current_user)
 
     return
 
