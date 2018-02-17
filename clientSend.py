@@ -54,6 +54,7 @@ def delete_request(conn, username):
 
     return
 
+
 # message sending
 def send_message_request(sock, current_user):
     while True:
@@ -66,10 +67,13 @@ def send_message_request(sock, current_user):
             break
 
     print "Enter the message you'd like to send to this user."
-    _message = raw_input()
-
+    message = raw_input()
+    send_message('\x01' +
+                 pack('!I', (2 * config.username_length) + len(message)) +
+                 '\x30' +
+                 pack(config.request_body_fmt['\x30'] % len(message), message),
+                 sock)
     # send message!
-
 
 
 # message delivery

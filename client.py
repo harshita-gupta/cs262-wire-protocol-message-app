@@ -17,6 +17,8 @@ opcodes = {'\x11': create_success,
            '\x22': login_failure,
            '\x61': logout_success,
            '\x71': delete_success,
+           '\x31': send_message_success,
+           '\x32': send_message_failure
            # '\x22': general_failure,
            # '\x31': deposit_success,
            # '\x32': general_failure,
@@ -70,7 +72,7 @@ def processInput(requestNumber):
         clientSend.create_request(sock)
 
     elif requestNumber == str(3):
-        clientSent.send_message_request(sock, current_user)
+        clientSend.send_message_request(sock, current_user)
 
     # login
     elif requestNumber == str(2):
