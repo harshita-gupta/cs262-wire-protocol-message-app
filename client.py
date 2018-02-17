@@ -181,7 +181,6 @@ if __name__ == '__main__':
         # Get the list sockets which are readable
         read_sockets, write_sockets, error_sockets = select.select(
             socket_list, [], [])
-        print read_sockets
 
         for s in read_sockets:
 
