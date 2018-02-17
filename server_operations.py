@@ -154,6 +154,7 @@ def send_message_request(connection, buf, payload_len,
         pack(pack_header_fmt, header[0], header[1], '\x80') +
         buf[6:payload_len + 6])
 
+    print error
     with lock:
         if success:
             send_message_success(connection)
