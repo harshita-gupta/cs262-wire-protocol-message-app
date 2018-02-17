@@ -1,4 +1,12 @@
-# Import socket module
+# This is the main file for the client.
+# It sets up a connection with a server, prompts the user for input,
+# and processes these input.
+# Processed input and raw data from the server is used to determine
+# which functions in clientReceive and clientSend should be called.
+# The functions within clientReceive and clientSend handle specific
+# operations.
+
+
 import sys
 import config
 import socket
