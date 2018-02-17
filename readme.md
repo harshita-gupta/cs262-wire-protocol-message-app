@@ -5,4 +5,5 @@ All connections are on port 12345.
 2) Open a second terminal and run python client.py.
 3) When prompted for IP in client.py, enter the public IP of the computer running server.py or 127.0.0.1 if running the two server and client processes on the same computer. 
 
-You will now 
+You will now see the prompt "WELCOME - type the number of a function:"
+1) 
