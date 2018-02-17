@@ -47,7 +47,7 @@ def delete_success(conn, netBuffer):
 
 def delete_failure(conn, netBuffer):
     print "\nCannot delete account", reason_string(netBuffer)
-    return True, ""
+    return False, ""
 
 
 def list_success(conn, netBuffer):
@@ -66,5 +66,5 @@ def send_message_success(conn, netBuffer):
 
 
 def send_message_failure(conn, netBuffer):
-    print "\nMessage sending failed.", reason_string(buf)
-    return True, ""
+    print "\nMessage sending failed.", reason_string(netBuffer)
+    return False, ""

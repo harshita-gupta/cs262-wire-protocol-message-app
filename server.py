@@ -1,7 +1,6 @@
 # File that implements key functions for the server.
-# Calls methods in serverSend.py and serverReceive.py
+# Calls methods in server_state.py and server_operations.py
 
-# first of all import the socket library
 import socket
 import traceback
 import thread

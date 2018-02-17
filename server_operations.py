@@ -155,7 +155,7 @@ def send_message_failure(connection, reason):
     print "Sending failure of send message operation"
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x32' +
-        pack(request_body_fmt['\x32'] % len(reason), reason), conn)
+        pack(request_body_fmt['\x32'] % len(reason), reason), connection)
     return None
 
 
