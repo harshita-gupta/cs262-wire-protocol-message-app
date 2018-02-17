@@ -126,6 +126,7 @@ def getResponse():
 
         # send packet to correct handler based on opcode
         opcode = header[2]
+        print bytes(opcode)
 
         try:
             success, info = opcodes[opcode](sock, buf)

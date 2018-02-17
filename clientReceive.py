@@ -2,6 +2,14 @@ from struct import unpack
 from config import *
 
 
+def reason_string(buf):
+    header = unpack(pack_header_fmt, buf[0:6])
+    reason = unpack(request_body_fmt['\x32'] %
+                    header[1],
+                    buf[6:header[1] + 6])[0]
+    return reason
+
+
 def create_success(conn, netBuffer):
     values = unpack(username_fmt, netBuffer[6:14])
     current_user = values[0]
@@ -10,7 +18,7 @@ def create_success(conn, netBuffer):
 
 
 def create_failure(conn, netBuffer):
-    print "\nAccount creation failure--username already exists"
+    print "\nAccount creation failure.", reason_string(netBuffer)
     return False, ""
 
 
@@ -22,7 +30,7 @@ def login_success(conn, netBuffer):
 
 
 def login_failure(conn, netBuffer):
-    print "\nLogin failure. Please enter an existing username."
+    print "\nLogin failure.", reason_string(netBuffer)
     return False, ""
 
 
@@ -37,7 +45,7 @@ def delete_success(conn, netBuffer):
 
 
 def delete_failure(conn, netBuffer):
-    print "\nCannot delete account because of pending messages or account does not exist"
+    print "\nCannot delete account", reason_string(netBuffer)
     return True, ""
 
 
@@ -47,14 +55,11 @@ def list_success(conn, netBuffer):
 
 
 def send_message_success(conn, netBuffer):
-    values = unpack(username_fmt, netBuffer[6:14])
+    values = unpack(username_fmt, netBuffer[6:11])
     print "\nSuccessfully sent message to %s" % values[0]
 
 
 def send_message_failure(conn, netBuffer):
-    header = unpack(pack_header_fmt, retBuffer[0:6])
-    reason = unpack(request_body_fmt['\x32'] %
-                    header[1] - (2 * username_length),
-                    netBuffer[6:header[1] + 6])[0]
+    print "\nMessage sending failed.", reason_string(buf)
 
-    print "\nMessage sending failed.", reason
+

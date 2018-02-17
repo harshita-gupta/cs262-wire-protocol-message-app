@@ -84,11 +84,8 @@ def send_message_request(sock, current_user):
     print "Enter the message you'd like to send to this user."
     message = raw_input()
     payload_len = (2 * config.username_length) + len(message)
-    print payload_len
     fmt_str = config.request_body_fmt['\x30'] % len(message)
-    print fmt_str
-    head_str = '\x01' + pack('!I', payload_len) + '\x30'
-    send_message(head_str +
+    send_message('\x01' + pack('!I', payload_len) + '\x30' +
                  pack(fmt_str,
                       current_user, receiving_user, message),
                  sock)
