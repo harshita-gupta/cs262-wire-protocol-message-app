@@ -188,21 +188,22 @@ if __name__ == '__main__':
             # Incoming message from remote server
             if s == sock:
                 header, retbuf = get_server_message()
+                print len(retbuf)
                 if header[2] != '\x80':
                     logging.info(("received server message with unexpected"
                                   "op code, ignoring."))
                     continue
                 message_len = header[1] - (2 * username_length)
                 values = unpack(config.request_body_fmt['\x80'] % message_len,
-                                retbuf)
+                                retbuf[6:6 + header[1]])
                 if values[1] != current_user:
                     clientSend.deliver_request_failure(
                         sock,
                         "Message intended for %s. %s is currently logged in" %
-                        values[1], current_user)
+                        (values[1], current_user))
                 else:
-                    print "Message from %s: %s" % values[0], values[3]
-                    clientSend.deliver_request_success(conn, current_user)
+                    print "Message from %s: %s" % (values[0], values[2])
+                    clientSend.deliver_request_success(sock, current_user)
 
             # User entered a message.
             # We stay within this block until the message is processed
@@ -217,7 +218,7 @@ if __name__ == '__main__':
                     processInput(sessionInput)
                     getResponse()
                     if int(sessionInput) == 3 or int(sessionInput) == 6:
-                        current_user = None 
+                        current_user = None
                         current_user = require_log_in()
 
     # mySocket.close()

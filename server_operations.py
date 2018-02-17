@@ -51,12 +51,13 @@ def send_login_failure(connection):
         connection)
     return None
 
+
 def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     print active_clients.list_active_clients()
     success, info = active_clients.log_in(username, lock, conn, accounts)
-    if success == True:
+    if success:
         with lock:
             send_login_success(conn, username)
     else:
@@ -170,11 +171,14 @@ def send_message_request(connection, buf, payload_len,
 
     return None
 
+
 # Operation codes that can be received and processed by the server.
 opcodes = {'\x10': create_request,
            '\x20': login_request,
            '\x50': list_request,
            '\x60': logout_request,
            '\x70': delete_request,
-           '\x30': send_message_request}
-           # '\x30': send_message_request,
+           '\x30': send_message_request,
+           '\x81': deliver_message_success,
+           '\x82': deliver_message_failure
+           }
