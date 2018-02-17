@@ -19,7 +19,7 @@ opcodes = {'\x11': create_success,
            '\x71': delete_success,
            '\x72': delete_failure,
            '\x31': send_message_success,
-           '\x32': send_message_failure, 
+           '\x32': send_message_failure,
            '\x51': list_success
            # '\x22': general_failure,
            # '\x31': deposit_success,
@@ -39,11 +39,11 @@ WELCOME - type the number of a function:
     (1) Create account
     (2) Log in
     (3) Delete an account
-    (4) List all accounts 
+    (4) List all accounts
     '''
     while True:
         startupInput = raw_input('>> ')
-        if startupInput.isdigit() and int(startupInput) > 0 and int(startupInput) < 5:            
+        if startupInput.isdigit() and int(startupInput) > 0 and int(startupInput) < 5:
             break
 
     return startupInput
@@ -52,10 +52,10 @@ WELCOME - type the number of a function:
 def prompt_for_session_input():
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
-    (3) Delete your account 
+    (3) Delete your account
     (4) List all accounts
     (5) Send a message
-    (6) Log out 
+    (6) Log out
     '''
     sys.stdout.flush()
 
@@ -83,11 +83,11 @@ def processInput(requestNumber):
     elif requestNumber == str(3):
         clientSend.delete_request(sock, current_user)
 
-    # list 
+    # list
     elif requestNumber == str(4):
         clientSend.list_request(sock)
 
-    # message 
+    # message
     elif requestNumber == str(5):
         clientSend.send_message_request(sock, current_user)
 
@@ -96,6 +96,7 @@ def processInput(requestNumber):
         clientSend.logout_request(sock, current_user)
 
     return
+
 
 def get_server_message():
     try:
@@ -138,17 +139,17 @@ def require_log_in():
     while True:
         startupInput = getStartupInput()
 
-        # if creating account or logging in 
-        if int(startupInput) == 1 or int(startupInput) == 2: 
+        # if creating account or logging in
+        if int(startupInput) == 1 or int(startupInput) == 2:
             processInput(startupInput)
             success, username = getResponse()
             if success:
                 return username
             else:
                 print username
-        else: 
+        else:
             processInput(startupInput)
-            getResponse() 
+            getResponse()
 
 
 
