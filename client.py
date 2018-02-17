@@ -34,7 +34,8 @@ WELCOME - type the number of a function:
     '''
     while True:
         startupInput = raw_input('>> ')
-        if startupInput.isdigit() and int(startupInput) > 0 and int(startupInput) < 5:
+        if (startupInput.isdigit() and
+                int(startupInput) > 0 and int(startupInput) < 5):
             break
 
     return startupInput
@@ -55,7 +56,8 @@ def getSessionInput():
     prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
-        if sessionInput.isdigit() and int(sessionInput) > 2 and int(sessionInput) < 7:
+        if (sessionInput.isdigit() and
+                int(sessionInput) > 2 and int(sessionInput) < 7):
             break
 
     return sessionInput
@@ -142,13 +144,11 @@ def require_log_in():
             getResponse()
 
 
-
 if __name__ == '__main__':
 
     logging.basicConfig(
         format=logging_fmt,
         filename="clientLog.log")
-
 
     # SET UP SOCKET
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

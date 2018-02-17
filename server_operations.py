@@ -2,8 +2,22 @@ from struct import unpack, pack
 from config import *
 from server_state import send_or_queue_message
 
-# CREATE REQUEST
 
+################################################
+# SERVER OPERATIONS ########################
+################################################
+
+'''
+This file contains the implementations for all operations that the server
+supports.
+
+Under each operation, there is a primary operation function
+which calls the 1-2 helper functions that allow it to communicate
+failure or success to the client.
+'''
+
+
+# OPERATION 1: CREATE REQUEST
 
 def send_create_success(connection, username):
     print"sending create success"
@@ -34,7 +48,7 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return
 
 
-# LOGIN REQUEST
+# OPERATION 2: LOGIN REQUEST
 
 def send_login_success(connection, username):
     print"sending login success"
@@ -70,7 +84,7 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return
 
 
-# LOGOUT REQUEST
+# OPERATION 3: LOGOUT REQUEST
 
 
 def send_logout_success(connection):
@@ -88,7 +102,7 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return
 
 
-# DELETE REQUEST
+# OPERATION 4: DELETE REQUEST
 
 def send_delete_success(conn):
     print"sending delete success"
@@ -116,7 +130,7 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return
 
 
-# LIST REQUEST
+# OPERATION 5: LIST REQUEST
 
 def send_list_success(conn, accounts):
     logging.info("sending list success")
@@ -134,7 +148,7 @@ def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     return
 
 
-# SEND MESSAGE REQUEST
+# OPERATION 6: SEND MESSAGE REQUEST
 
 
 def send_message_failure(connection, reason):
@@ -176,6 +190,13 @@ def send_message_request(connection, buf, payload_len,
     return None
 
 
+################################################
+# DELIVERY CONFIRMATIONS ########################
+################################################
+
+# This section of the file contains the two functions
+# that confirm to the server that a client received its delivery.
+
 # CONFIRM RECEIPT
 def deliver_message_success(conn, netBuffer, payload_len, lock, accounts,
                             active_clients, pack_fmt):
@@ -190,6 +211,11 @@ def deliver_message_failure(conn, netBuffer, payload_len, lock, accounts,
                     netBuffer[6:payload_len + 6])[0]
 
     print "\nDelivering message failed.", reason
+
+
+################################################
+# OPERATION CODES - FUNCTION MAPPINGS ##########
+################################################
 
 
 # Operation codes that can be received and processed by the server.

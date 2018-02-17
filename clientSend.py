@@ -1,7 +1,6 @@
 import config
 from config import send_message
 from struct import pack
-from sys import maxint, exit
 
 
 # create new account
