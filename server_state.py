@@ -130,14 +130,14 @@ class AccountList(object):
                                                      deque())
         return (True, "")
 
-    def add_pending_message(self, receiving_user, packed_message):
+    def add_pending_message(self, receiving_user, pm):
         # list of accounts should not be modified while adding a message
         logging.info("waiting to obtain accountList")
         with self.lock:
             if receiving_user not in self.accounts:
                 return (False, "Receiving user no longer exists")
             with self.__pending_messages[receiving_user][0]:
-                self.__pending_messages[receiving_user].append(packed_message)
+                self.__pending_messages[receiving_user][1].append(pm)
         return (True, "")
 
     def deliver_pending_messages(self, receiving_username, lock, sock):
