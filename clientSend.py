@@ -59,6 +59,14 @@ def delete_request(conn, username):
 
     return
 
+# list
+def list_request(conn):
+    print "LISTING ALL ACCOUNTS \n"
+    send_message('\x01' + pack('!I', 5) + '\x50' +
+        pack(config.username_fmt, ""), conn)
+
+    return
+
 
 # message sending
 def send_message_request(sock, current_user):

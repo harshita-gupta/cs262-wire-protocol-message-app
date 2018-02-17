@@ -19,7 +19,8 @@ opcodes = {'\x11': create_success,
            '\x71': delete_success,
            '\x72': delete_failure,
            '\x31': send_message_success,
-           '\x32': send_message_failure
+           '\x32': send_message_failure, 
+           '\x51': list_success
            # '\x22': general_failure,
            # '\x31': deposit_success,
            # '\x32': general_failure,
@@ -38,10 +39,11 @@ WELCOME - type the number of a function:
     (1) Create account
     (2) Log in
     (6) Delete an account 
+    (7) List all accounts 
     '''
     while True:
         startupInput = raw_input('>> ')
-        if int(startupInput) == 1 or int(startupInput) == 2 or int(startupInput) == 6:
+        if int(startupInput) == 1 or int(startupInput) == 2 or int(startupInput) == 6 or int(startupInput) == 7:
             break
 
     return startupInput
@@ -54,6 +56,7 @@ YOU ARE LOGGED IN! - type the number of a function:
     (4) List all accounts
     (5) Log out
     (6) Delete your account
+    (7) List all accounts 
     '''
     sys.stdout.flush()
 
@@ -62,7 +65,7 @@ def getSessionInput():
     prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
-        if int(sessionInput) > 2 and int(sessionInput) < 7:
+        if int(sessionInput) > 2 and int(sessionInput) < 8:
             break
 
     return sessionInput
@@ -88,8 +91,11 @@ def processInput(requestNumber):
     elif requestNumber == str(6):
         clientSend.delete_request(sock, current_user)
 
-    return
+    # list 
+    elif requestNumber == str(7):
+        clientSend.list_request(sock)
 
+    return
 
 def get_server_message():
     try:
