@@ -1,4 +1,5 @@
 from struct import unpack, pack
+import config 
 from config import *
 from server_state import send_or_queue_message
 
@@ -114,9 +115,10 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 def send_list_success(conn, accounts):
     logging.info("sending list success")
-    send_message('\x01' + pack('!I', 0) + '\x51', conn)
+    send_message(
+        '\x01' + pack('!I', len(accounts)) + '\x51' +
+        pack(config.request_body_fmt['\x51'] % len(accounts), accounts), conn)
     return
-
 
 def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     accounts = accounts.list_accounts()

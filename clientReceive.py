@@ -1,4 +1,5 @@
 from struct import unpack
+import config 
 from config import *
 
 
@@ -40,10 +41,12 @@ def delete_failure(conn, netBuffer):
     print "\nCannot delete account because of pending messages or account does not exist"
     return True, ""
 
-
 def list_success(conn, netBuffer):
-    print "\nAccounts to be listed here"
-    return True, ""
+	header = unpack(config.pack_header_fmt, netBuffer[0:6])
+	length = header[1]
+	values = unpack(config.request_body_fmt['\x51'] % length, netBuffer[6:6+length])
+	print "Accounts: " + values[0]
+	return True, ""
 
 
 def send_message_success(conn, netBuffer):

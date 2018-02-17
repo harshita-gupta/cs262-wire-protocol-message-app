@@ -32,6 +32,7 @@ request_body_fmt = {
     '\x71': "",            # delete success, no payload
     '\x21': "",            # log in success, no payload
     '\x31': username_fmt,  # send message success
+    '\x51': "!%is",  # list users failure
     '\x81': username_fmt,  # deliver message success
 
     ########
