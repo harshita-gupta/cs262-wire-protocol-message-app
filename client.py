@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # SET UP SOCKET
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        sock.connect(('127.0.0.1', config.port))
+        sock.connect((raw_input("IP: "), config.port))
     except:
         print "ERROR: could not connect to host or port"
         sys.exit()
