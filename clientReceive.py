@@ -27,4 +27,7 @@ def logout_success(conn, netBuffer):
     print "Successfully logged out"
     return True, ""
 
+def delete_success(conn, netBuffer):
+    print "Successfully deleted account"
+    return True, ""
 

@@ -142,7 +142,7 @@ public class MessageAppProtocol {
      * <li>{@link #DELETE_FAILURE}, if account deletion fails.
      * </ul>
      */
-    public static final byte DELETE_REQUEST = 0x20;
+    public static final byte DELETE_REQUEST = 0x70;
 
     /**
      * Account deletion success. Server response to a client's
@@ -150,7 +150,7 @@ public class MessageAppProtocol {
      * Opcode: {@code 0x21} <br>
      * Payload: none
      */
-    public static final byte DELETE_SUCCESS = 0x21;
+    public static final byte DELETE_SUCCESS = 0x71;
 
     /**
      * Account deletion failure. Server response to a client's
@@ -167,7 +167,7 @@ public class MessageAppProtocol {
      * <li> message delivery to that user is pending
      * </ul>
      */
-    public static final byte DELETE_FAILURE = 0x22;
+    public static final byte DELETE_FAILURE = 0x72;
 
     /**
      * Send message request from a client to a server. This message should
@@ -425,14 +425,14 @@ public class MessageAppProtocol {
      * </ul>
      * <p>
      */
-    public static final byte LOG_IN = 0x70;
+    public static final byte LOG_IN = 0x20;
 
     /**
      * Log in success. Server response to a client's {@link #LOG_IN}. <br>
      * Opcode: {@code 0x71} <br>
      * Payload: None.
      */
-    public static final byte LOG_IN_SUCCESS = 0x71;
+    public static final byte LOG_IN_SUCCESS = 0x21;
 
     /**
      * Log in failure. Server response to a client's {@link #LOG_IN}. <br>
@@ -448,5 +448,5 @@ public class MessageAppProtocol {
      * <li> This user is already logged in on another machine.
      * </ul>
      */
-    public static final byte LOG_IN_FAILURE = 0x72;
+    public static final byte LOG_IN_FAILURE = 0x22;
 }

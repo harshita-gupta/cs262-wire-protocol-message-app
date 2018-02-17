@@ -83,8 +83,10 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 # DELETE REQUEST
 
-def send_delete_success(username):
-    return None
+def send_delete_success(connection):
+    print"sending delete success"
+    send_message('\x01' + pack('!I', 0) + '\x71', connection)
+    return
 
 
 def send_delete_failure(username, reason):
@@ -92,7 +94,13 @@ def send_delete_failure(username, reason):
 
 
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
-    return None
+    values = unpack(pack_fmt, buf[6:14])
+    username = values[0]
+    active_clients.log_out(username)
+    accounts.delete_account(username)
+    with lock:
+        send_delete_success(conn)
+    return
 
 
 # SEND MESSAGE REQUEST
@@ -148,7 +156,6 @@ def list_users_request(connection,
 opcodes = {'\x10': create_request,
            '\x20': login_request,
            '\x60': logout_request,
+           '\x70': delete_request}
            # '\x30': send_message_request,
            # '\x50': list_users_request,
-           # '\x70': log_in_request
-           }

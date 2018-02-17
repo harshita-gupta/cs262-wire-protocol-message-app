@@ -48,6 +48,7 @@ def handle_client(connection, lock, accounts, active_clients):
             payload_len = header[1]
             if sent_version == version and len(netBuffer) == payload_len + 6:
                 opcode = header[2]
+                print header
                 # try to send packet to correct handler
                 try:
                     opcodes[opcode](

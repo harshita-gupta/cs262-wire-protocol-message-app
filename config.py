@@ -18,18 +18,19 @@ request_body_fmt = {
     ########
 
     '\x10': username_fmt,  # create request
-    '\x20': username_fmt,  # delete request
+    '\x20': username_fmt,  # log in request
     '\x50': "",            # list users request
     '\x51': "!%is",            # list users success, has list attached
     '\x60': username_fmt,  # log out request
+    '\x70': username_fmt, # delete request 
 
     ########
     # SUCCESS CODES
     ########
 
     '\x11': username_fmt,  # create success
-    '\x21': "",            # delete success, no payload
-    '\x71': "",            # log in success, no payload
+    '\x71': "",            # delete success, no payload
+    '\x21': "",            # log in success, no payload
     '\x31': username_fmt,  # send message success
     '\x81': username_fmt,  # deliver message success
 

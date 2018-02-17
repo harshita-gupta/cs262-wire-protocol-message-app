@@ -16,6 +16,7 @@ opcodes = {'\x11': create_success,
            '\x21': login_success,
            '\x22': login_failure,
            '\x61': logout_success,
+           '\x71': delete_success,
            # '\x22': general_failure,
            # '\x31': deposit_success,
            # '\x32': general_failure,
@@ -75,6 +76,10 @@ def processInput(requestNumber):
     # logout
     elif requestNumber == str(5):
         clientSend.logout_request(sock, current_user)
+
+    # delete
+    elif requestNumber == str(6):
+        clientSend.delete_request(sock, current_user)
 
     return
 
@@ -157,7 +162,7 @@ if __name__ == '__main__':
                     sessionInput = getSessionInput()
                     processInput(sessionInput)
                     getResponse()
-                    if int(sessionInput) == 5:
+                    if int(sessionInput) == 5 or int(sessionInput) == 6:
                         current_user = require_log_in()
 
     # mySocket.close()

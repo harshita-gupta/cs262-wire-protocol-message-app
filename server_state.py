@@ -126,7 +126,7 @@ class AccountList(object):
                 return (False, "Username already exists.")
             else:
                 self.accounts.add(username)
-                self.__pending_messages[username] = (threading.Lock,
+                self.__pending_messages[username] = (threading.Lock(),
                                                      deque())
         return (True, "")
 
@@ -156,7 +156,7 @@ class AccountList(object):
         # TODO this function should be called in server_operations log_in
         return None
 
-    def delete_account(self, username, active_clients):
+    def delete_account(self, username):
         logging.info("waiting to obtain accountList")
         with self.lock:
             if username not in self.accounts:
@@ -169,7 +169,7 @@ class AccountList(object):
                            username)
                     return (False, mes)
                 self.accounts.remove(username)
-                self.__pending_messages.remove(username)
+                del self.__pending_messages[username]
                 return (True, "")
 
     def account_exists(self, username):
