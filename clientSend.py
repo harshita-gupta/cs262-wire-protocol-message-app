@@ -96,11 +96,11 @@ def send_message_request(sock, current_user):
 
 # message delivery
 def deliver_request_success(conn, username):
-    send_message('\x01' + pack('!I', 5) + '\x10' +
-                 pack(config.username_fmt, username), conn)
+    send_message('\x01' + pack('!I', 5) + '\x81' +
+                 pack(config.request_body_fmt['\x81'], username), conn)
 
 
 def deliver_request_failure(conn, reason):
     send_message(
-        '\x01' + pack('!I', len(reason)) + '\x10' +
-        pack(config.deliver_request_failure % len(reason), reason), conn)
+        '\x01' + pack('!I', len(reason)) + '\x82' +
+        pack(config.request_body_fmt['\x82'] % len(reason), reason), conn)
