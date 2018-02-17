@@ -151,6 +151,7 @@ class AccountList(object):
                 dq = self.__pending_messages[receiving_username][1]
                 while dq:
                     config.send_message(dq[0], sock)
+                    # recv confirmation that message was delivered
                     dq.popleft()
 
         # TODO this function should be called in server_operations log_in

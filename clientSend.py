@@ -45,3 +45,14 @@ def logout_request(conn, username):
 
     return
 
+
+# message delivery
+def deliver_request_success(conn, username):
+    send_message('\x01' + pack('!I', 5) + '\x10' +
+                 pack(config.username_fmt, username), conn)
+
+
+def deliver_request_failure(conn, reason):
+    send_message(
+        '\x01' + pack('!I', len(reason)) + '\x10' +
+        pack(config.deliver_request_failure % len(reason), reason), conn)
