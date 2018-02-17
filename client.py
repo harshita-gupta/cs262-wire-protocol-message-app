@@ -21,15 +21,6 @@ opcodes = {'\x11': create_success,
            '\x31': send_message_success,
            '\x32': send_message_failure,
            '\x51': list_success
-           # '\x22': general_failure,
-           # '\x31': deposit_success,
-           # '\x32': general_failure,
-           # '\x41': withdraw_success,
-           # '\x42': general_failure,
-           # '\x51': balance_success,
-           # '\x52': general_failure,
-           # '\x61': end_session_success,
-           # '\x62': unknown_opcode
            }
 
 
@@ -217,5 +208,6 @@ if __name__ == '__main__':
                 if int(sessionInput) == 3 or int(sessionInput) == 6:
                     current_user = None
                     current_user = require_log_in()
+                prompt_for_session_input()
 
     # mySocket.close()
