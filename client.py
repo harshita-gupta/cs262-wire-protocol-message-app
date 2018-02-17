@@ -164,7 +164,7 @@ if __name__ == '__main__':
     try:
         sock.connect(('127.0.0.1', config.port))
     except:
-        print "ERROR: could not connect to port: " + config.port
+        print "ERROR: could not connect to host or port"
         sys.exit()
 
     # UPON LAUNCHING THE PROGRAM, USER MUST LOG IN OR
