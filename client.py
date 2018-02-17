@@ -43,7 +43,7 @@ WELCOME - type the number of a function:
     '''
     while True:
         startupInput = raw_input('>> ')
-        if int(startupInput) > 0 and int(startupInput) < 5:            
+        if startupInput.isdigit() and int(startupInput) > 0 and int(startupInput) < 5:            
             break
 
     return startupInput
@@ -64,7 +64,7 @@ def getSessionInput():
     prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
-        if int(sessionInput) > 2 and int(sessionInput) < 7:
+        if sessionInput.isdigit() and int(sessionInput) > 2 and int(sessionInput) < 7:
             break
 
     return sessionInput
