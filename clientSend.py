@@ -81,8 +81,12 @@ def send_message_request(sock, current_user):
         if len(receiving_user) == 5:
             break
 
-    print "Enter the message you'd like to send to this user."
-    message = raw_input()
+    print ("Enter the message you'd like to send to this user."
+           "Messages are limited to 1008 characters.")
+    message = raw_input("you to %s:" % receiving_user)
+    while len(message) > 1008:
+        message = raw_input("you to %s:" % receiving_user)
+
     payload_len = (2 * config.username_length) + len(message)
     fmt_str = config.request_body_fmt['\x30'] % len(message)
     send_message('\x01' + pack('!I', payload_len) + '\x30' +
