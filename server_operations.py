@@ -1,6 +1,7 @@
 from struct import unpack, pack
 import config 
 from config import *
+import config
 from server_state import send_or_queue_message
 
 # CREATE REQUEST
@@ -15,9 +16,9 @@ def send_create_success(connection, username):
 
 def send_create_failure(connection, username, reason):
     print"sending create failure"
-    # TODO question for lisa: are we sending the reason right now?
     send_message(
-        '\x01' + pack('!I', 0) + '\x12',
+        '\x01' + pack('!I', len(reason)) + '\x12' +
+        pack(config.request_body_fmt['\x12'] % len(reason), reason),
         connection)
     return None
 
@@ -44,10 +45,11 @@ def send_login_success(connection, username):
     return
 
 
-def send_login_failure(connection):
+def send_login_failure(connection, reason):
     print"sending login failure"
     send_message(
-        '\x01' + pack('!I', 0) + '\x22',
+        '\x01' + pack('!I', len(reason)) + '\x22' +
+        pack(config.request_body_fmt['\x22'] % len(reason), reason),
         connection)
     return None
 
@@ -62,7 +64,7 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
             send_login_success(conn, username)
     else:
         with lock:
-            send_login_failure(conn)
+            send_login_failure(conn, info)
     return
 
 
@@ -136,7 +138,7 @@ def send_message_failure(connection, reason):
     logging.info("Sending failure of send message operation")
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x32' +
-        pack(config.deliver_request_failure % len(reason), reason), conn)
+        pack(config.request_body_fmt['\x32'] % len(reason), reason), conn)
     return None
 
 
@@ -162,7 +164,6 @@ def send_message_request(connection, buf, payload_len,
         pack(pack_header_fmt, header[0], header[1], '\x80') +
         buf[6:payload_len + 6])
 
-    print error
     with lock:
         if success:
             send_message_success(receiving_user, connection)
@@ -170,6 +171,21 @@ def send_message_request(connection, buf, payload_len,
             send_message_failure(connection, error)
 
     return None
+
+
+def deliver_message_success(conn, netBuffer, payload_len, lock, accounts,
+                            active_clients, pack_fmt):
+    values = unpack(username_fmt, netBuffer[6:14])
+    print "\nSuccessfully delivered message to %s" % values[0]
+
+
+def deliver_message_failure(conn, netBuffer, payload_len, lock, accounts,
+                            active_clients, pack_fmt):
+    reason = unpack(request_body_fmt['\x32'] %
+                    payload_len - (2 * username_length),
+                    netBuffer[6:payload_len + 6])[0]
+
+    print "\nDelivering message failed.", reason
 
 
 # Operation codes that can be received and processed by the server.
