@@ -179,6 +179,6 @@ opcodes = {'\x10': create_request,
            '\x60': logout_request,
            '\x70': delete_request,
            '\x30': send_message_request,
-           '\x81': deliver_message_success,
-           '\x82': deliver_message_failure
+           # '\x81': deliver_message_success,
+           # '\x82': deliver_message_failure
            }
