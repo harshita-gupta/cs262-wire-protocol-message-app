@@ -48,7 +48,7 @@ def logout_request(conn, username):
 
 # delete
 def delete_request(conn, username):
-    if username != None:
+    if not username:
         print "\nDELETING YOUR ACCOUNT \n"
         send_message('\x01' + pack('!I', 5) + '\x70' +
                      pack(config.username_fmt, username), conn)

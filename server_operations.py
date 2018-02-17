@@ -50,12 +50,13 @@ def send_login_failure(connection):
         connection)
     return None
 
+
 def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     print active_clients.list_active_clients()
     success, info = active_clients.log_in(username, lock, conn, accounts)
-    if success == True:
+    if success:
         with lock:
             send_login_success(conn, username)
     else:
