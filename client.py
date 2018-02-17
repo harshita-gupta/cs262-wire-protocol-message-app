@@ -126,8 +126,6 @@ def getResponse():
 
         # send packet to correct handler based on opcode
         opcode = header[2]
-        print bytes(opcode)
-
         try:
             success, info = opcodes[opcode](sock, buf)
         except KeyError:
@@ -189,7 +187,6 @@ if __name__ == '__main__':
             # Incoming message from remote server
             if s == sock:
                 header, retbuf = get_server_message()
-                print len(retbuf)
                 if header[2] != '\x80':
                     logging.info(("received server message with unexpected"
                                   "op code, ignoring."))

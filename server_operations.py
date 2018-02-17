@@ -1,5 +1,5 @@
 from struct import unpack, pack
-import config 
+import config
 from config import *
 import config
 from server_state import send_or_queue_message
@@ -105,7 +105,7 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     if username in active_clients.sockets:
         active_clients.log_out(username)
     success, reason = accounts.delete_account(username)
-    if success == True:
+    if success:
         with lock:
             send_delete_success(conn)
     else:
@@ -123,6 +123,7 @@ def send_list_success(conn, accounts):
         pack(config.request_body_fmt['\x51'] % len(accounts), accounts), conn)
     return
 
+
 def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     accounts = accounts.list_accounts()
     print accounts
@@ -135,7 +136,7 @@ def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 
 def send_message_failure(connection, reason):
-    logging.info("Sending failure of send message operation")
+    print "Sending failure of send message operation"
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x32' +
         pack(config.request_body_fmt['\x32'] % len(reason), reason), conn)
@@ -143,7 +144,7 @@ def send_message_failure(connection, reason):
 
 
 def send_message_success(username, connection):
-    logging.info("Sending success of send message operation.")
+    print "sening success of send message"
     send_message('\x01' + pack('!I', 5) + '\x31' +
                  pack(username_fmt, username), connection)
     return None
@@ -173,6 +174,7 @@ def send_message_request(connection, buf, payload_len,
     return None
 
 
+# CONFIRM RECEIPT
 def deliver_message_success(conn, netBuffer, payload_len, lock, accounts,
                             active_clients, pack_fmt):
     values = unpack(username_fmt, netBuffer[6:14])

@@ -1,5 +1,5 @@
 from struct import unpack
-import config 
+import config
 from config import *
 
 
@@ -49,20 +49,22 @@ def delete_failure(conn, netBuffer):
     print "\nCannot delete account", reason_string(netBuffer)
     return True, ""
 
+
 def list_success(conn, netBuffer):
-	header = unpack(config.pack_header_fmt, netBuffer[0:6])
-	length = header[1]
-	values = unpack(config.request_body_fmt['\x51'] % length, netBuffer[6:6+length])
-	print "Accounts: " + values[0]
-	return True, ""
+    header = unpack(config.pack_header_fmt, netBuffer[0:6])
+    length = header[1]
+    values = unpack(
+        config.request_body_fmt['\x51'] % length, netBuffer[6:6 + length])
+    print "Accounts: " + values[0]
+    return True, ""
 
 
 def send_message_success(conn, netBuffer):
     values = unpack(username_fmt, netBuffer[6:11])
     print "\nSuccessfully sent message to %s" % values[0]
+    return True, ""
 
 
 def send_message_failure(conn, netBuffer):
     print "\nMessage sending failed.", reason_string(buf)
-
-
+    return True, ""
