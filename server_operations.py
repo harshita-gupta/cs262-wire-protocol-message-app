@@ -113,7 +113,7 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 # LIST REQUEST
 
 def send_list_success(conn, accounts):
-    print"sending list success"
+    logging.info("sending list success")
     send_message('\x01' + pack('!I', 0) + '\x51', conn)
     return
 
@@ -130,12 +130,17 @@ def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 
 def send_message_failure(connection, reason):
-
+    logging.info("Sending failure of send message operation")
+    send_message(
+        '\x01' + pack('!I', len(reason)) + '\x32' +
+        pack(config.deliver_request_failure % len(reason), reason), conn)
     return None
 
 
-def send_message_success(connection):
-    connection.send('\x01' + pack('!I', 4) + '\x12')
+def send_message_success(username, connection):
+    logging.info("Sending success of send message operation.")
+    send_message('\x01' + pack('!I', 5) + '\x31' +
+                 pack(username_fmt, username), connection)
     return None
 
 
@@ -157,7 +162,7 @@ def send_message_request(connection, buf, payload_len,
     print error
     with lock:
         if success:
-            send_message_success(connection)
+            send_message_success(receiving_user, connection)
         else:
             send_message_failure(connection, error)
 
