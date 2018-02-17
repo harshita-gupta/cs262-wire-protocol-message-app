@@ -216,7 +216,7 @@ if __name__ == '__main__':
                     sessionInput = getSessionInput()
                     processInput(sessionInput)
                     getResponse()
-                    if int(sessionInput) == 5 or int(sessionInput) == 6:
+                    if int(sessionInput) == 3 or int(sessionInput) == 6:
                         current_user = None
                         current_user = require_log_in()
 
