@@ -274,60 +274,6 @@ public class MessageAppProtocol {
      */
     public static final byte DELIVER_MESSAGE_FAILURE = 0x82;
 
-    // /**
-    //  * Withdrawal request from a client to a server. This message should only be
-    //  * sent to a server; if received by a client it should be ignored. <br>
-    //  * Opcode: {@code 0x40} <br>
-    //  * Payload:
-    //  * <ul>
-    //  * <li>(int) account_number
-    //  * <li>(int) amount
-    //  * </ul>
-    //  *
-    //  * <p>
-    //  * The {@code account_number} is the number of the account from which the
-    //  * money should be withdrawn. The {@code amount} should be a positive
-    //  * whole-number amount of USD to be withdrawn the specified account not to
-    //  * exceed the account's current balance. After the server processes the
-    //  * withdrawal request, the server sends one of the following acknowledgments
-    //  * to the client:
-    //  * <ul>
-    //  * <li> {@link #WITHDRAW_SUCCESS}, if account withdrawal succeeds.
-    //  * <li>{@link #WITHDRAW_FAILURE}, if account withdrawal fails.
-    //  * </ul>
-    //  */
-    // public static final byte WITHDRAW_REQUEST = 0x40;
-
-    // /**
-    //  * Withdrawal success. Server response to a client's {@link #WITHDRAW_REQUEST}. <br>
-    //  * Opcode: {@code 0x41} <br>
-    //  * Payload:
-    //  * <ul>
-    //  * <li>(int) balance
-    //  * </ul>
-    //  *
-    //  * The {@code balance} returned reflects the balance in the specified
-    //  * account after {@code amount} is deposited.
-    //  */
-    // public static final byte WITHDRAW_SUCCESS = 0x41;
-
-    // /**
-    //  * Withdrawal failure. Server response to a client's {@link #WITHDRAW_REQUEST}. <br>
-    //  * Opcode: {@code 0x42} <br>
-    //  * Payload:
-    //  * <ul>
-    //  * <li>(String) reason
-    //  * </ul>
-    //  * This message indicates that the server rejects the
-    //  * {@link #WITHDRAW_REQUEST} for some reason, for example:
-    //  * <ul>
-    //  * <li>invalid username,
-    //  * <li>insufficient funds,
-    //  * <li>invalid deposit amount.
-    //  * </ul>
-    //  */
-    // public static final byte WITHDRAW_FAILURE = 0x42;
-
     /**
      * List users request from a client to a server.
      * This message should only be sent to a server; if
