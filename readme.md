@@ -1,10 +1,12 @@
 This is our client-server wire protocol assignment.
-All connections are on port 12345.
+All connections are on port 12345. Must use Python 2, not Python 3. 
+
+EDIT 02/17/18 6PM: MAKE SURE TO GIT CLONE THE ENTIRE REPOSITORY OR DOWNLOAD ALL THE FILES. YOU NEED ALL THE FILES TO RUN THE PROGRAM. 
 
 SECTION 1. RUNNING SERVER AND CLIENT
 1) To run, open a terminal and run python server.py.
 2) Open a second terminal and run python client.py.
-3) When prompted for IP in client.py, enter the public IP of the computer running server.py or 127.0.0.1 if running the two server and client processes on the same computer.
+3) When prompted for IP in client.py, enter the network (wifi) IP of the computer running server.py or 127.0.0.1 if running the two server and client processes on the same computer. If you are on a Mac, you can find the network IP by opening network preferences. Under Status: Connected, it will say "Wi-Fi is connected to [network name] and has the IP address [ip address]."
 
 SECTION 2. USING THE CHAT INTERFACE
 You will now see the prompt "WELCOME - type the number of a function:"
