@@ -149,14 +149,14 @@ def handle_client(connection, lock, accounts, active_clients):
 
 
 if __name__ == '__main__':
-'''
-Server's main loop logic. Completes basic configuration for the
-server and then sets up a socket to receive client connections over.
-Instantiates state objects i.e. active clients list, account list,
-pending messages list.
-Receives connections from clients and spawns new thread to manage each
-client, where it receives messages and responds to them.
-'''
+    '''
+    Server's main loop logic. Completes basic configuration for the
+    server and then sets up a socket to receive client connections over.
+    Instantiates state objects i.e. active clients list, account list,
+    pending messages list.
+    Receives connections from clients and spawns new thread to manage each
+    client, where it receives messages and responds to them.
+    '''
     # set up logging
     logging.basicConfig(
         format=config.logging_fmt,

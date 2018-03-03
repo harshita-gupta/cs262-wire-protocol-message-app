@@ -14,7 +14,11 @@ pack_header_fmt = '!cIc'
 
 username_fmt = "!%is" % username_length
 
-# dictionary linking opcodes to format strings used for packing and unpacking
+
+'''
+Dictionary linking opcodes to format strings used for packing and unpacking
+the message body for that opcode
+'''
 request_body_fmt = {
 
     ########
@@ -24,8 +28,6 @@ request_body_fmt = {
 
     '\x10': username_fmt,  # create request
     '\x20': username_fmt,  # log in request
-    '\x50': "",            # list users request
-    '\x51': "!%is",            # list users success, has list attached
     '\x60': username_fmt,  # log out request
     '\x70': username_fmt,  # delete request
 
@@ -51,6 +53,14 @@ request_body_fmt = {
     '\x52': "!%is",  # list users failure
     '\x82': "!%is",  # deliver message failure
     '\x72': "!%is",  # log in failure
+
+    ########
+    # LIST USER CODES
+    ##########
+
+    '\x50': "!%is",        # list users request, has regexp request attached
+    '\x51': "!%is",        # list users success, has list attached
+
 
     ########
     # Message sending codes

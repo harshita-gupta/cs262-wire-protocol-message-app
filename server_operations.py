@@ -1,4 +1,5 @@
 from struct import unpack, pack
+import re
 from config import *
 from server_state import send_or_queue_message
 
@@ -137,6 +138,10 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 # OPERATION 3: LOGOUT REQUEST
 
+def send_logout_success(connection):
+    print"sending logout success"
+    send_message('\x01' + pack('!I', 0) + '\x61', connection)
+
 def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     '''
     Processes a log in request from a client.
@@ -169,9 +174,6 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
     :return: None.
     '''
-    def send_logout_success(connection):
-        print"sending logout success"
-        send_message('\x01' + pack('!I', 0) + '\x61', connection)
 
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
@@ -219,8 +221,12 @@ def send_list_success(conn, accounts):
     return
 
 
-def list_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
-    accounts = accounts.list_accounts()
+def list_request(conn, buf, payload_len, lock, accounts,
+                 active_clients, pack_fmt):
+    header = unpack(pack_header_fmt, buf[:6])
+    pack_fmt = pack_fmt % (payload_len - (2 * username_length))
+    regexp = unpack(pack_fmt, buf[6:14])[0]
+    accs = [acc for acc in accounts.list_accounts() if re.search(regexp, acc)]
     print accounts
     with lock:
             send_list_success(conn, accounts)

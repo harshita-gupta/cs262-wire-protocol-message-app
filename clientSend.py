@@ -15,9 +15,7 @@ def create_request(conn):
             break
 
     send_message('\x01' + pack('!I', 5) + '\x10' +
-                 pack(config.username_fmt, username), conn)
-
-    return
+                 pack(config.request_body_fmt['\x10'], username), conn)
 
 
 # log in to an existing account
@@ -32,39 +30,47 @@ def login_request(conn):
             break
 
     send_message('\x01' + pack('!I', 5) + '\x20' +
-                 pack(config.username_fmt, username), conn)
-    return
+                 pack(config.request_body_fmt['\x20'], username), conn)
 
 
 # log out
 def logout_request(conn, username):
     print "\nLOGGING OUT \n"
     send_message('\x01' + pack('!I', 5) + '\x60' +
-                 pack(config.username_fmt, username), conn)
-
-    return
+                 pack(config.request_body_fmt['\x60'], username), conn)
 
 
 # delete
 def delete_request(conn, username):
     if username:
         print "\nDELETING YOUR ACCOUNT \n"
-        send_message('\x01' + pack('!I', 5) + '\x70' +
-                     pack(config.username_fmt, username), conn)
     else:
         username = raw_input(
             'Enter the username of the account to be deleted: ')
-        send_message('\x01' + pack('!I', 5) + '\x70' +
-                     pack(config.username_fmt, username), conn)
 
-    return
+    send_message('\x01' + pack('!I', 5) + '\x70' +
+                     pack(config.request_body_fmt['\x70'], username), conn)
 
 
 # list
 def list_request(conn):
-    print "\nLISTING ALL ACCOUNTS \n"
+    raw = raw_input(
+        '''
+        Choose from the following options:
+        0) List all users
+        1) List users whose username match a specified regular expression.
+
+        Please enter your choice below.
+        ''')
+    if raw == str(0):
+        print "\nLISTING ALL ACCOUNTS \n"
+        regexp = ".*"
+    else:
+        regexp = raw_input("Enter the regexp used to search the user list.")
+
     send_message('\x01' + pack('!I', 5) + '\x50' +
-                 pack(config.username_fmt, ""), conn)
+                 pack(config.request_body_fmt['\x50'] % len(regexp), regexp),
+                conn)
 
     return
 
@@ -80,7 +86,7 @@ def send_message_request(sock, current_user):
         if len(receiving_user) == 5:
             break
 
-    print ("Enter the message you'd like to send to this user."
+    print ("Enter the message you'd like to send to this user. "
            "Messages are limited to 1008 characters.")
     message = raw_input("you to %s:" % receiving_user)
     while len(message) > 1008:

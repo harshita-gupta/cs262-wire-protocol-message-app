@@ -280,8 +280,10 @@ public class MessageAppProtocol {
      * This message should only be sent to a server; if
      * received by a client it should be ignored. <br>
      * Opcode: {@code 0x50} <br>
-     * No payload.
-     *
+     * Paylod:
+     * <ul>
+     * <li>(String) regexp_to_match
+     * </ul>
      * <p>
      * After the server processes the account balance check
      * request, the server sends one of the following acknowledgments to the
@@ -303,24 +305,9 @@ public class MessageAppProtocol {
      * </ul>
      *  <p>
      * {@code all_users} is a new-line separated list of all users currently
-     * registered (who have not been deleted).
+     * registered (who have not been deleted) who match the regexp string.
      */
     public static final byte LIST_USERS_SUCCESS = 0x51;
-
-    // /** IMPOSSIBLE SO REMOVED
-    //  * List users failure. Server response to a client's {@link #LIST_USERS_REQUEST}. <br>
-    //  * Opcode: {@code 0x52} <br>
-    //  * Payload:
-    //  * <ul>
-    //  * <li>(String) reason
-    //  * </ul>
-    //  * This message indicates that the server rejects the
-    //  * {@link #LIST_USERS_REQUEST} for some reason, for example:
-    //  * <ul>
-    //  * <li> no users exist.
-    //  * </ul>
-    //  */
-    // public static final byte LIST_USERS_FAILURE = 0x52;
 
     /**
      * Request from a client to a server to disconnect that the user is logging out.
