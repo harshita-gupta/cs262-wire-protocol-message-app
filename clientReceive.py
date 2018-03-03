@@ -4,6 +4,9 @@ from config import *
 
 
 def reason_string(buf):
+    '''
+
+    '''
     header = unpack(pack_header_fmt, buf[0:6])
     reason = unpack(request_body_fmt['\x32'] %
                     header[1],

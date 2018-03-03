@@ -1,7 +1,31 @@
-This is our client-server wire protocol assignment.
-All connections are on port 12345. Must use Python 2, not Python 3. 
+Fixes to make:
 
-EDIT 02/17/18 6PM: MAKE SURE TO GIT CLONE THE ENTIRE REPOSITORY OR DOWNLOAD ALL THE FILES. YOU NEED ALL THE FILES TO RUN THE PROGRAM. 
+-0.5 Does not support use of regular expressions to parse list of users. -0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username).
+
+-0.25 Messages to self appear as sent, but are never delivered (the documentation does not clarify if these are not actually sent, or if they are not getting delivered.)
+
+BS THIS WAS SPECIFIED YOU PIECE OF SHIT UGH -0.25 "5. Delete an account. You will need to specify the semantics of what happens if you attempt to delete an account that contains undelivered message." These semantics are not specified in the documentation.
+
+The system works in general but had issues with some edge cases. A few in particular I noticed:
+- There is no listing by wildcard
+
+- At one point when I tried to log in, I got an error about the string size in struct.unpack (The string it was trying to unpack on the client side did not match 5-character size), though I didn't track down exactly where it came from, as the error didn't occur on a few future attempts.
+
+- There is no sort of client-side error information if the user enters an invalid username.
+
+- There is no server-side enforcement of much of the specification! For example, the client currently verifies that the username is 5 characters long, but the server does no checks.
+
+- If User 1 is logged in, User 2 is still able to delete User 1's account. User 1 is not logged out on the client side and is still able to send messages.
+
+- If a user fails to log out properly (e.g., closes the terminal), the socket will not be closed. So if a user was logged in on the improperly closed client, the server considers the session still open and the user cannot log in elsewhere.
+
+The spec is clear. The implementation code has many comments, but it does not use any standard python documentation format (PyDoc), and there are many functions that are undocumented.
+
+
+This is our client-server wire protocol assignment.
+All connections are on port 12345. Must use Python 2, not Python 3.
+
+EDIT 02/17/18 6PM: MAKE SURE TO GIT CLONE THE ENTIRE REPOSITORY OR DOWNLOAD ALL THE FILES. YOU NEED ALL THE FILES TO RUN THE PROGRAM.
 
 SECTION 1. RUNNING SERVER AND CLIENT
 1) To run, open a terminal and run python server.py.
