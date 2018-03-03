@@ -13,7 +13,7 @@ def create_request(conn):
         if(userInput.isalnum() and len(userInput) == 5):
             username = userInput
             break
-        print "We only support usernames that are alphanumeric and exactly 5 characters long."
+        print "We only support usernames that are alphanumeric and exactly 5 characters long. \nPlease try again."
 
     send_message('\x01' + pack('!I', 5) + '\x10' +
                  pack(config.request_body_fmt['\x10'], username), conn)
@@ -29,7 +29,7 @@ def login_request(conn):
         if(userInput.isalnum() and len(userInput) == 5):
             username = userInput
             break
-        print "We only support usernames that are alphanumeric and exactly 5 characters long."
+        print "We only support usernames that are alphanumeric and exactly 5 characters long. \nPlease try again."
 
     send_message('\x01' + pack('!I', 5) + '\x20' +
                  pack(config.request_body_fmt['\x20'], username), conn)
