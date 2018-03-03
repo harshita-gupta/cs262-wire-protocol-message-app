@@ -69,12 +69,9 @@ def list_request(conn):
     else:
         regexp = raw_input("Enter the regexp used to search the user list.")
 
-    send_message('\x01' + pack('!I', 5) + '\x50' +
+    send_message('\x01' + pack('!I', len(regexp)) + '\x50' +
                  pack(config.request_body_fmt['\x50'] % len(regexp), regexp),
                 conn)
-
-    return
-
 
 # message sending
 def send_message_request(sock, current_user):
