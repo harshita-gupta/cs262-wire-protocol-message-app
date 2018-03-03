@@ -136,7 +136,8 @@ public class MessageAppProtocol {
      * <p>
      * The {@code account_number} is the number of the account to be deleted.
      * After the server processes the deletion request, the server sends one of
-     * the following acknowledgments to the client:
+     * the following acknowledgments to the client. Check DELETE_FAILURE fr
+     * reasons that the request might fail.
      * <ul>
      * <li> {@link #DELETE_SUCCESS}, if account deletion succeeds.
      * <li>{@link #DELETE_FAILURE}, if account deletion fails.
@@ -164,7 +165,7 @@ public class MessageAppProtocol {
      * {@link #DELETE_REQUEST} for some reason, for example:
      * <ul>
      * <li> invalid username (account might've already been deleted)
-     * <li> message delivery to that user is pending
+     * <li> message delivery to that user is pending, so the account cannot be deleted.
      * </ul>
      */
     public static final byte DELETE_FAILURE = 0x72;

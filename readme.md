@@ -6,8 +6,6 @@ Fixes to make:
 
 -0.25 Messages to self appear as sent, but are never delivered (the documentation does not clarify if these are not actually sent, or if they are not getting delivered.)
 
-BS THIS WAS SPECIFIED YOU PIECE OF SHIT UGH -0.25 "5. Delete an account. You will need to specify the semantics of what happens if you attempt to delete an account that contains undelivered message." These semantics are not specified in the documentation.
-
 The system works in general but had issues with some edge cases. A few in particular I noticed:
 - There is no listing by wildcard
 

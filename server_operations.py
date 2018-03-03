@@ -10,23 +10,19 @@ from server_state import send_or_queue_message
 '''
 This file contains the implementations for all operations that the server
 supports.
-
-Under each operation, there is a primary operation function
-which calls the 1-2 helper functions that allow it to communicate
-failure or success to the client.
 '''
 
 
 # OPERATION 1: CREATE REQUEST
-
 
 def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     '''
     Processes a creation request from a client.
     If the operation succeeds, sends a creation success message to the client
     at conn, and if it fails, sends a creation failure message to the client
-    at conn. Failure and success requirements are defined by the accounts
-    object, which create_request is simply a user-interaction wrapper for.
+    at conn. Failure and success requirements are defined by the
+    accounts.add_account method,
+    which create_request is simply a user-interaction wrapper for.
 
     If the user is successfully created, also logs in the client that initiated
     the request.
@@ -47,6 +43,8 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     the transaction requests initated by the server.
     :param pack_fmt: The fornat used to unpack the message body of the create
     request.
+
+    :return: None.
     '''
 
     # Helper functions
@@ -54,7 +52,6 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
         print"sending create success"
         send_message('\x01' + pack('!I', 5) + '\x11' +
                      pack(username_fmt, username), connection)
-        return
 
     def send_create_failure(connection, username, reason):
         print"sending create failure"
@@ -62,7 +59,6 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
             '\x01' + pack('!I', len(reason)) + '\x12' +
             pack(request_body_fmt['\x12'] % len(reason), reason),
             connection)
-        return None
 
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
@@ -73,28 +69,56 @@ def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
             send_create_success(conn, username)
         else:
             send_create_failure(conn, username, error)
-    return
 
 
 # OPERATION 2: LOGIN REQUEST
 
-def send_login_success(connection, username):
-    print"sending login success"
-    send_message('\x01' + pack('!I', 5) + '\x21' +
-                 pack(username_fmt, username), connection)
-    return
-
-
-def send_login_failure(connection, reason):
-    print"sending login failure"
-    send_message(
-        '\x01' + pack('!I', len(reason)) + '\x22' +
-        pack(request_body_fmt['\x22'] % len(reason), reason),
-        connection)
-    return None
-
-
 def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    '''
+    Processes a log in request from a client.
+    If the operation succeeds, sends a log in success message to the client
+    at conn, and if it fails, sends a log in failure message to the client
+    at conn. Failure and success requirements are defined by the
+    active_clients.log_in method,
+    which login_request is simply a user-interaction wrapper for.
+
+    If the client successfully logs in, also attempts to deliver
+    all the pending messages to the client
+    using the acounts.deliver_pending_messages method.
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the login request message body
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the login
+    request.
+
+    :return: None.
+    '''
+
+    # Helper functinos
+    def send_login_success(connection, username):
+        print"sending login success"
+        send_message('\x01' + pack('!I', 5) + '\x21' +
+                     pack(username_fmt, username), connection)
+
+    def send_login_failure(connection, reason):
+        print"sending login failure"
+        send_message(
+            '\x01' + pack('!I', len(reason)) + '\x22' +
+            pack(request_body_fmt['\x22'] % len(reason), reason),
+            connection)
+
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     print active_clients.list_active_clients()
@@ -109,19 +133,46 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     else:
         with lock:
             send_login_failure(conn, info)
-    return
 
 
 # OPERATION 3: LOGOUT REQUEST
 
-
-def send_logout_success(connection):
-    print"sending logout success"
-    send_message('\x01' + pack('!I', 0) + '\x61', connection)
-    return
-
-
 def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    '''
+    Processes a log in request from a client.
+    If the operation succeeds, sends a log in success message to the client
+    at conn, and if it fails, sends a log in failure message to the client
+    at conn. Failure and success requirements are defined by the
+    active_clients.log_in method,
+    which login_request is simply a user-interaction wrapper for.
+
+    If the client successfully logs in, also attempts to deliver
+    all the pending messages to the client
+    using the acounts.deliver_pending_messages method.
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the login request message body
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the login
+    request.
+
+    :return: None.
+    '''
+    def send_logout_success(connection):
+        print"sending logout success"
+        send_message('\x01' + pack('!I', 0) + '\x61', connection)
+
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     active_clients.log_out(username)
