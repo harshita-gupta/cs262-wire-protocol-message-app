@@ -19,23 +19,51 @@ failure or success to the client.
 
 # OPERATION 1: CREATE REQUEST
 
-def send_create_success(connection, username):
-    print"sending create success"
-    send_message('\x01' + pack('!I', 5) + '\x11' +
-                 pack(username_fmt, username), connection)
-    return
-
-
-def send_create_failure(connection, username, reason):
-    print"sending create failure"
-    send_message(
-        '\x01' + pack('!I', len(reason)) + '\x12' +
-        pack(request_body_fmt['\x12'] % len(reason), reason),
-        connection)
-    return None
-
 
 def create_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    '''
+    Processes a creation request from a client.
+    If the operation succeeds, sends a creation success message to the client
+    at conn, and if it fails, sends a creation failure message to the client
+    at conn. Failure and success requirements are defined by the accounts
+    object, which create_request is simply a user-interaction wrapper for.
+
+    If the user is successfully created, also logs in the client that initiated
+    the request.
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the create request message body
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock object is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the create
+    request.
+    '''
+
+    # Helper functions
+    def send_create_success(connection, username):
+        print"sending create success"
+        send_message('\x01' + pack('!I', 5) + '\x11' +
+                     pack(username_fmt, username), connection)
+        return
+
+    def send_create_failure(connection, username, reason):
+        print"sending create failure"
+        send_message(
+            '\x01' + pack('!I', len(reason)) + '\x12' +
+            pack(request_body_fmt['\x12'] % len(reason), reason),
+            connection)
+        return None
+
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
     success, error = accounts.add_account(username)

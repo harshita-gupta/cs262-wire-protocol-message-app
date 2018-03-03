@@ -139,11 +139,23 @@ class AccountList(object):
         self.__pending_messages = {}
 
     def add_account(self, username):
-        # TODO check that username is alphanumeric
+        '''
+        Adds a new account to the server database
+        Fails if the account already exists, or if it does not meet
+        the username length requirement.
+
+        :param username: username of the new account
+        :return: tuple of (boolean, String).
+                 Returns (True, "") if the request succeeds, adn
+                 (False, failure-reason) if the request fails.
+        '''
         logging.info("Waiting to obtain accountList")
         with self.lock:
             if username in self.accounts:
                 return (False, "Username already exists.")
+            elif len(username) != 5:
+                return (
+                    False, "Username is only allowed to be five characters.")
             else:
                 self.accounts.add(username)
                 self.__pending_messages[username] = (threading.Lock(),
@@ -151,9 +163,10 @@ class AccountList(object):
         return (True, "")
 
     def add_pending_message(self, receiving_user, pm):
-        # list of accounts should not be modified while adding a message
+
         logging.info("waiting to obtain accountList")
         with self.lock:
+            # lock: list of accounts shouldn't be modified while adding message
             if receiving_user not in self.accounts:
                 return (False, "Receiving user no longer exists")
             with self.__pending_messages[receiving_user][0]:

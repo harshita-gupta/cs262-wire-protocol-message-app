@@ -29,7 +29,7 @@ def unknown_opcode(conn):
 
 def recordConnect(addr):
     '''
-    A function without side effects that logs the opening of a connection to 
+    A function without side effects that logs the opening of a connection to
     addr by flushing it to the log file and printing it to console.
 
     :param addr: the address of the connection created.
@@ -42,17 +42,17 @@ def recordConnect(addr):
 
 def get_client_message(connection):
     '''
-	Attempts to receive a message from the client. 
-	Checks for a message that is MESSAGE_MAX_SIZE. 
-	Ends the client's thread if the connection is down.
-	If a message is successfully received, unpacks its header
-	and returns the header's three properties: protocol version number,
-	payload length, and the operation code. In addition to the header's
-	three properties, returns a buffer containing the message body.
+    Attempts to receive a message from the client.
+    Checks for a message that is MESSAGE_MAX_SIZE.
+    Ends the client's thread if the connection is down.
+    If a message is successfully received, unpacks its header
+    and returns the header's three properties: protocol version number,
+    payload length, and the operation code. In addition to the header's
+    three properties, returns a buffer containing the message body.
 
-	:param conn: socket object containing the connection to the client.
-	:return: tuple with four elements. (protocol version number,
-	payload length, operation code, message body buffer)
+    :param conn: socket object containing the connection to the client.
+    :return: tuple with four elements. (protocol version number,
+    payload length, operation code, message body buffer)
     '''
 
     try:
@@ -74,22 +74,32 @@ def get_client_message(connection):
 # threaded method for handling an individual client
 def handle_client(connection, lock, accounts, active_clients):
     '''
-	handle_client is started on a new thread by the primary server loop.
-	It monitors the connection with each individual client, receives messages
-	from the client, and responds to them.
+    handle_client is started on a new thread by the primary server loop.
+    It monitors the connection with each individual client, receives messages
+    from the client, and responds to them.
 
-	If an invalid opcode is sent to the server, the server allows the
-	client a second attempt before closing the connection, 
-	so that no spamming clients are supported.
-	
-	:param connection: socket object that represents the connection to the client.
-	:param lock: the lock primitive that we use to ensure that only one message
-	is sent to a server at a time, and two messages originating from different threads (eg. server's response to a request and another client's message delivery) do not get delivered simultaneously and thus garble each other's byes. The lock object is acquired before any connection.send operation.
-	:param accounts: the server_state.AccountList object. This is a reference to the server's database that this client will send access/transaction requests to. 
-	:param active_clients: the server_state.ActiveClients object. This is also a reference to a server database object that facilitates the transaction requests initated by the server. 
+    If an invalid opcode is sent to the server, the server allows the
+    client a second attempt before closing the connection,
+    so that no spamming clients are supported.
 
-	:return: Only returns if the connection with the client is dropped, either because the client sent too many erroneous messages or because the client shut down, in which case it returns None. 
-	'''
+    :param connection: socket object representing the connection to the client.
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock object is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+
+    :return: Only returns if the connection with the client is dropped,
+    either because the client sent too many erroneous messages
+    or because the client shut down, in which case it returns None.
+    '''
 
     # keep track of erroneous opcodes
     second_attempt = 0
@@ -140,12 +150,12 @@ def handle_client(connection, lock, accounts, active_clients):
 
 if __name__ == '__main__':
 '''
-Server's main loop logic. Completes basic configuration for the 
+Server's main loop logic. Completes basic configuration for the
 server and then sets up a socket to receive client connections over.
-Instantiates state objects i.e. active clients list, account list, 
-pending messages list. 
-Receives connections from clients and spawns new thread to manage each 
-client, where it receives messages and responds to them.  
+Instantiates state objects i.e. active clients list, account list,
+pending messages list.
+Receives connections from clients and spawns new thread to manage each
+client, where it receives messages and responds to them.
 '''
     # set up logging
     logging.basicConfig(
@@ -187,8 +197,8 @@ client, where it receives messages and responds to them.
         # start a new thread
         lock = thread.allocate_lock()
 
-	# the handle_client method receives client messages
-	# and triggers the appropriate server operation to respond to that 
-	# client message.
+    # the handle_client method receives client messages
+    # and triggers the appropriate server operation to respond to that
+    # client message.
         thread.start_new_thread(
             handle_client, (sock, lock, accounts, active_clients))
