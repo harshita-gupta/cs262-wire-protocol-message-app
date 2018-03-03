@@ -25,9 +25,10 @@ def login_request(conn):
     print "Enter your username"
     while True:
         userInput = raw_input('>> ')
-        if(userInput.isalnum() and len(userInput) <= 5):
+        if(userInput.isalnum() and len(userInput) == 5):
             username = userInput
             break
+        print "Existing usernames are alphanumeric and exactly 5 characters long."
 
     send_message('\x01' + pack('!I', 5) + '\x20' +
                  pack(config.request_body_fmt['\x20'], username), conn)

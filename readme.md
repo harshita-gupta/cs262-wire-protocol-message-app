@@ -2,7 +2,7 @@ Fixes to make:
 
 -0.5 Does not support use of regular expressions to parse list of users.
 
--0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username).
+-0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username). CLIENT-SIDE FIXED. SERVER-SIDE????? 
 
 -0.25 Messages to self appear as sent, but are never delivered (the documentation does not clarify if these are not actually sent, or if they are not getting delivered.)
 
