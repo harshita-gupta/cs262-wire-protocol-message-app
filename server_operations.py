@@ -1,5 +1,4 @@
 from struct import unpack, pack
-import re
 from config import *
 from server_state import send_or_queue_message
 
@@ -218,19 +217,22 @@ def send_list_success(conn, accounts):
     send_message(
         '\x01' + pack('!I', len(accounts)) + '\x51' +
         pack(request_body_fmt['\x51'] % len(accounts), accounts), conn)
-    return
 
 
 def list_request(conn, buf, payload_len, lock, accounts,
                  active_clients, pack_fmt):
     header = unpack(pack_header_fmt, buf[:6])
-    pack_fmt = pack_fmt % (payload_len - (2 * username_length))
+    pack_fmt = pack_fmt % payload_len
+    print pack_fmt
+    print buf[6:14]
     regexp = unpack(pack_fmt, buf[6:14])[0]
-    accs = [acc for acc in accounts.list_accounts() if re.search(regexp, acc)]
-    print accounts
+    if regexp == ".*":
+        accs = accounts.list_accounts()
+    else:
+        accs = accounts.list_accounts_with_regex(regexp)
+    print accs
     with lock:
-            send_list_success(conn, accounts)
-    return
+            send_list_success(conn, accs)
 
 
 # OPERATION 6: SEND MESSAGE REQUEST

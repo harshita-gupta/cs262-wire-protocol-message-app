@@ -1,13 +1,10 @@
 Fixes to make:
 
--0.5 Does not support use of regular expressions to parse list of users.
-
 -0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username).
 
 -0.25 Messages to self appear as sent, but are never delivered (the documentation does not clarify if these are not actually sent, or if they are not getting delivered.)
 
 The system works in general but had issues with some edge cases. A few in particular I noticed:
-- There is no listing by wildcard
 
 - At one point when I tried to log in, I got an error about the string size in struct.unpack (The string it was trying to unpack on the client side did not match 5-character size), though I didn't track down exactly where it came from, as the error didn't occur on a few future attempts.
 

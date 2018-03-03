@@ -38,7 +38,7 @@ WELCOME - type the number of a function:
     (1) Create account
     (2) Log in
     (3) Delete an account
-    (4) List all accounts
+    (4) List accounts
     '''
     while True:
         startupInput = raw_input('>> ')
@@ -53,7 +53,7 @@ def prompt_for_session_input():
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
     (3) Delete your account
-    (4) List all accounts
+    (4) List accounts
     (5) Send a message
     (6) Log out
     '''

@@ -1,3 +1,4 @@
+import re
 import threading
 import logging
 import thread
@@ -225,6 +226,14 @@ class AccountList(object):
             if not len(self.accounts):
                 return "No accounts exist!"
             return ', '.join(str(e) for e in self.accounts)
+
+    def list_accounts_with_regex(self, regex):
+        logging.info("waiting to obtain accountlist")
+        with self.lock:
+            accs = [acc for acc in self.accounts if re.search(regex, acc)]
+            if not len(accs):
+                return "No matching accounts exist!"
+            return ', '.join(str(e) for e in accs)
 
 
 def send_or_queue_message(accounts, active_clients, receiving_user,
