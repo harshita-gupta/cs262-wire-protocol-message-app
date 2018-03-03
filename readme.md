@@ -4,8 +4,6 @@ Fixes to make:
 
 -0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username). CLIENT-SIDE FIXED. SERVER-SIDE????? 
 
-The system works in general but had issues with some edge cases. A few in particular I noticed:
-
 - At one point when I tried to log in, I got an error about the string size in struct.unpack (The string it was trying to unpack on the client side did not match 5-character size), though I didn't track down exactly where it came from, as the error didn't occur on a few future attempts.
 
 - There is no sort of client-side error information if the user enters an invalid username.
