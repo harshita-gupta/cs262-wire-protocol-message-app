@@ -130,6 +130,7 @@ def getResponse():
         try:
             success, info = opcodes[opcode](sock, buf)
         except KeyError:
+            "got a keyerror"
             break
 
         return success, info

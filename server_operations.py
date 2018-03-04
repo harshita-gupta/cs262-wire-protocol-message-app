@@ -256,7 +256,7 @@ def send_message_failure(connection, reason):
 
 
 def send_message_success(username, connection):
-    print "sening success of send message"
+    print "sending success of send message"
     send_message('\x01' + pack('!I', 5) + '\x31' +
                  pack(username_fmt, username), connection)
     return None
@@ -296,13 +296,13 @@ def send_message_request(connection, buf, payload_len,
 # CONFIRM RECEIPT
 def deliver_message_success(conn, netBuffer, payload_len, lock, accounts,
                             active_clients, pack_fmt):
-    values = unpack(username_fmt, netBuffer[6:14])
+    values = unpack(request_body_fmt['\x81'], netBuffer[6:14])
     print "\nSuccessfully delivered message to %s" % values[0]
 
 
 def deliver_message_failure(conn, netBuffer, payload_len, lock, accounts,
                             active_clients, pack_fmt):
-    reason = unpack(request_body_fmt['\x32'] %
+    reason = unpack(request_body_fmt['\x82'] %
                     payload_len - (2 * username_length),
                     netBuffer[6:payload_len + 6])[0]
 

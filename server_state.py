@@ -221,6 +221,21 @@ class AccountList(object):
         return (True, "")
 
     def deliver_pending_messages(self, receiving_username, lock, sock):
+        '''
+        Delivers all pending messages for a given user to a client.
+        Fails if the account does not exist, or if delivery to the client
+        is responded to with an error message.
+
+        :param receiving_username: username of the user whose pending messages
+        should be dequeued and sent over the socket.
+        :param lock: lock object that should be acquired before any
+        messages are sent over the socket.
+        :param sock: socket object over which to send messages,
+
+        :return: tuple of (boolean, String).
+                 Returns (True, "") if the request succeeds, and
+                 (False, failure-reason) if the request fails.
+        '''
         if not self.account_exists(receiving_username):
             return (False, "account %s does not exist." % receiving_username)
         logging.info(
@@ -244,6 +259,17 @@ class AccountList(object):
         return True, ""
 
     def delete_account(self, username):
+        '''
+        Deletes an account from the server's database. Deletion fails if
+        the username does not exist, or if there are messages still pending
+        to that user.
+
+        :param username: the username of the account to be deleted.
+
+        :return: tuple of (boolean, String).
+                 Returns (True, "") if the request succeeds, and
+                 (False, failure-reason) if the request fails.
+        '''
         logging.info("waiting to obtain accountList")
         with self.lock:
             if username not in self.accounts:
@@ -260,6 +286,12 @@ class AccountList(object):
                 return (True, "")
 
     def account_exists(self, username):
+        '''
+        Checks if a given account exists in the server's database.
+
+        :param username: username to check for.
+        :return: boolean indicating existence of account.
+        '''
         logging.info("waiting to obtain accountList")
         with self.lock:
             if username in self.accounts:
@@ -267,6 +299,13 @@ class AccountList(object):
             return False
 
     def list_accounts(self):
+        '''
+        Returns a comma-separated string of all accounts that exist
+        on the server.
+
+        :return: comma separated string of all accounts that exist on the
+        server.
+        '''
         logging.info("waiting to obtain accountlist")
         with self.lock:
             if not len(self.accounts):
@@ -274,6 +313,17 @@ class AccountList(object):
             return ', '.join(str(e) for e in self.accounts)
 
     def list_accounts_with_regex(self, regex):
+        '''
+        Returns a comma-separated string of all accounts that exist
+        on the server that contain a string matching the
+        provided regex sequence.
+
+        :param regex: string containing the regex sequence that each account
+        returned should contin a match for.
+
+        :return: comma separated string of all accounts that exist on the
+        server that contain a substring that matches the given regex string.
+        '''
         logging.info("waiting to obtain accountlist")
         with self.lock:
             accs = [acc for acc in self.accounts if re.search(regex, acc)]
@@ -284,19 +334,39 @@ class AccountList(object):
 
 def send_or_queue_message(accounts, active_clients, receiving_user,
                           packed_message):
+    '''
+    References server database and active clients registry in order to
+    determine whether a message should be immediately delivered (if the
+    receipient is currently logged in and online) or queued for delivery
+    (if the recepient is not online).
+
+    :param active_clients: ActiveClients object that represents
+    server's current connection with clients.
+    :param accounts: AccountList object that represents server account
+    database.
+    :param receiving_user: the username of the recepient user.
+    :param packed_message: The message that should be sent to the recepient.
+        packed_message is a message of bytes packed using struct.pack,
+        packed according to the specifications for the DELIVER_MESSAGE_REQUEST
+        of a protocol version that the receiving user can understand.
+    '''
+    # check if receiving user exists
+    if not accounts.account_exists(receiving_user):
+        return (False, "Account %s does not exist." % receiving_user)
+
     # If the receiving user is currently logged in,
     # send the message immediately.
     # Otherwise, queue it for delivery.
     if active_clients.is_active(receiving_user):
         lock, sock = active_clients.sockets[receiving_user]
-        logging.info("Waiting to obtain lock for %s's socket" % receiving_user)
-        with lock:
-            config.send_message(packed_message, sock)
-            # TODO check for send failure
-        return (True, "")
-
-    # receiving user is not logged in, queue for delivery
-    if not accounts.account_exists(receiving_user):
-        return (False, "Account %s does not exist." % receiving_user)
-
+        print "Waiting to obtain lock for %s's socket" % receiving_user
+        try:
+            print "waiting on lock"
+            with lock:
+                sock.send(packed_message)
+            return (True, "")
+        except Exception as e:
+            # queue message for delivery if connection is down
+            print e
+            print "ERROR: connection down, queeing message for delivery instead"
     return accounts.add_pending_message(receiving_user, packed_message)

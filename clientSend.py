@@ -51,7 +51,7 @@ def delete_request(conn, username):
         username = raw_input(
             'Enter the username of the account to be deleted: ')
         own = "F"
-    username += own 
+    username += own
     print "here"
     send_message('\x01' + pack('!I', 6) + '\x70' +
                      pack(config.request_body_fmt['\x70'], username), conn)
