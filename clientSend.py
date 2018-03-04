@@ -7,16 +7,16 @@ from struct import pack
 ################################################
 
 '''
-This file contains the implementations for all requests the client 
-sends to the server. 
+This file contains the implementations for all requests the client
+sends to the server.
 '''
 
 # create new account
 def create_request(conn):
-    ''' 
+    '''
     Prompts user to input an original username. Repeats prompt if username
     does not follow the specs of being alphanumeric and exactly 5 characters
-    long. Packs and send the message to the server. 
+    long. Packs and send the message to the server.
 
     :param conn: connection to the server
     '''
@@ -35,10 +35,10 @@ def create_request(conn):
 
 # log in to an existing account
 def login_request(conn):
-    ''' 
+    '''
     Prompts user to input an existing username. Repeats prompt if username
     does not follow the specs of being alphanumeric and exactly 5 characters
-    long. Packs and send the message to the server. 
+    long. Packs and send the message to the server.
 
     :param conn: connection to the server
     '''
@@ -58,13 +58,13 @@ def login_request(conn):
 # log out
 def logout_request(conn, username):
     '''
-    Sends logout request to the server containing the username to be 
+    Sends logout request to the server containing the username to be
     removed from the active_clients list
 
     :param conn: connection to server
     :param username: current_user variable to be removed from active_clients
-    list 
-    ''' 
+    list
+    '''
     print "\nLOGGING OUT \n"
     send_message('\x01' + pack('!I', 5) + '\x60' +
                  pack(config.request_body_fmt['\x60'], username), conn)
@@ -74,10 +74,10 @@ def logout_request(conn, username):
 def delete_request(conn, username):
     '''
     If the user is logged in, then indicate that they are deleting their
-    own account by setting own = "T". Otherwise, retrieve the input of which 
-    account they want to delete. Pack and send to server. 
+    own account by setting own = "T". Otherwise, retrieve the input of which
+    account they want to delete. Pack and send to server.
 
-    :param username: current_id from client side 
+    :param username: current_id from client side
     '''
     if username:
         print "\nDELETING YOUR ACCOUNT \n"
@@ -95,7 +95,7 @@ def delete_request(conn, username):
 # list
 def list_request(conn):
     '''
-    Requests user to make a selection from functions. Set the 
+    Requests user to make a selection from functions. Set the
     regular expression accordingly. Pack and send to server
     '''
     raw = raw_input(
@@ -118,6 +118,14 @@ def list_request(conn):
 
 # message sending
 def send_message_request(sock, current_user):
+    '''
+    Method is executed once a user has indicated that they wish to
+    send a message to another user.
+    Prompts user for details of this message, and sends it.
+
+    :param sock: Socket object of connection to client.
+    :param current_user: string, sending user's username.
+    '''
     while True:
         print '''
         Enter the username of the user who you would like to send a
@@ -143,11 +151,27 @@ def send_message_request(sock, current_user):
 
 # message delivery
 def deliver_request_success(conn, username):
+    '''
+    Message sent from the client to the server indicating that a
+    chat message has successfully been recvd by the client and displayed.
+
+    :param conn: Socket object representing connection to server.
+    :param username: current user logged in, to whom delivery succeeded.
+    '''
     send_message('\x01' + pack('!I', 5) + '\x81' +
                  pack(config.request_body_fmt['\x81'], username), conn)
 
 
 def deliver_request_failure(conn, reason):
+    '''
+    Message sent from the client to the server indicating that a
+    chat message has not successfully been recvd by the client and displayed.
+
+    :param conn: Socket object representing connection to server.
+    :param reason: A string indicating why the delivery might have failed, for
+    example the user logged in is not the one for whom the message was
+    intended.
+    '''
     send_message(
         '\x01' + pack('!I', len(reason)) + '\x82' +
         pack(config.request_body_fmt['\x82'] % len(reason), reason), conn)
