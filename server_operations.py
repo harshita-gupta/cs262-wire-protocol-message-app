@@ -121,7 +121,6 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
     values = unpack(pack_fmt, buf[6:14])
     username = values[0]
-    print active_clients.list_active_clients()
     success, info = active_clients.log_in(username, lock, conn, accounts)
     if success:
         with lock:
@@ -140,6 +139,7 @@ def login_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 def send_logout_success(connection):
     print"sending logout success"
     send_message('\x01' + pack('!I', 0) + '\x61', connection)
+
 
 def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     '''
@@ -200,11 +200,14 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     username = values[0][0:5]
     own = values[0][5]
     if username in active_clients.sockets:
-        # if username is logged in and it's not yourself 
+        # if username is logged in and it's not yourself
         if own == "F":
             with lock:
-                send_delete_failure(conn, "Cannot delete account of a different user who is currently logged in.")
-            return 
+                send_delete_failure(
+                    conn,
+                    ("Cannot delete account of a different"
+                        " user who is currently logged in."))
+            return
         active_clients.log_out(username)
     success, reason = accounts.delete_account(username)
     if success:

@@ -27,6 +27,15 @@ state modifications.
 
 
 def get_client_message(connection):
+    ''' Retrieves a message over a socket and exists the client thread
+    if the socket connection is down.
+    :param connection: The socket object that represents the connection to the
+    client.
+    :return: Returns None if no message large enough to have a header was
+    received. If a message large enough was received, returns a 4 element
+    tuple with the protocol version number, the payload size, the opcode
+    number, and the buffer containing the header and the payload.
+    '''
     try:
         netBuffer = connection.recv(1024)
     except:
@@ -62,8 +71,6 @@ class ActiveClients(object):
     def __init__(self):
         """
         Constructor.
-        @param urls list of urls to check
-        @param output file to write urls output
         """
         self.lock = threading.Lock()
 
@@ -72,12 +79,27 @@ class ActiveClients(object):
         self.sockets = {}
 
     def is_active(self, username):
+        '''
+        Checks if a user is active or not.
+
+        :param username: Username of the user we are checking for.
+        :return: Boolean indicating whether the user is logged in or not.
+        '''
         with self.lock:
             if username in self.sockets:
                 return True
             return False
 
     def log_out(self, username):
+        '''
+        Logs out a currently logged in user. Fails if user is not
+        currently logged in, or does not exist.
+
+        :param username: Username of the user to log out.
+        :return: Tuple of Boolean, string, where boolean indicates whether
+        the logout was successful and string is set to a failure reason
+        if the logout failed.
+        '''
         if not self.sockets.get(username):
             return (False, "Username not currently logged in")
         logging.info("Waiting to obtain lock for active socket conns dict.")
@@ -91,6 +113,19 @@ class ActiveClients(object):
         return (True, "")
 
     def log_in(self, username, lock, sock, account_list):
+        '''
+        Logs a client in as a user that exists in the database
+        and that is not already logged in.
+
+        :param username: The username of the user that the client
+        wishes to log in as.
+        :param lock: The lock for the client's connection
+        :param sock: The socket object for the client connection
+        :account_list: The account database object for the server.
+        :return: Tuple of Boolean, string, where boolean indicates whether
+        the login was successful and string is set to a failure reason
+        if the login failed.
+        '''
         logging.info("Waiting to obtain lock for account list")
         with account_list.lock:
             if username not in account_list.accounts:
@@ -104,10 +139,6 @@ class ActiveClients(object):
                         "User %s is already logged in." % username)
                 self.sockets[username] = (lock, sock)
         return (True, "")
-
-    def list_active_clients(self):
-        with self.lock:
-            return ', '.join(str(e) for e in self.sockets.keys())
 
 
 class AccountList(object):
@@ -164,7 +195,22 @@ class AccountList(object):
         return (True, "")
 
     def add_pending_message(self, receiving_user, pm):
+        '''
+        Adds a pending message to the dequeue of undelivered messages for
+        that user, to be sent when the user is next online.
 
+        :param receiving_user: The message recepient's username.
+        :param pm: The message that should be sent to the user.
+        pm is a message of bytes packed using struct.pack, packed according to
+        the specifications for DELIVER_MESSAGE_REQUEST of a
+        protocol version that the receiving user can understand.
+        pm will be delivered to the receiving user in an unaltered format.
+
+        :return: tuple of (boolean, String).
+                 Returns (True, "") if the request succeeds, and
+                 (False, failure-reason) if the request fails. Fails
+                 if receiving_user does not exist in the server's database.
+        '''
         logging.info("waiting to obtain accountList")
         with self.lock:
             # lock: list of accounts shouldn't be modified while adding message
