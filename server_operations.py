@@ -184,26 +184,14 @@ def logout_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
 
 # OPERATION 4: DELETE REQUEST
 
-def send_delete_success(conn):
-    print"sending delete success"
-    send_message('\x01' + pack('!I', 0) + '\x71', conn)
-    return
-
-
-def send_delete_failure(conn, reason):
-    print"sending delete failure"
-    send_message('\x01' + pack('!I', 0) + '\x72', conn)
-
-
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
-    ''' 
-    Process a delete account request. Does not allow deletion if
-    the user is logged in on another session and it is a different user
-    from yourself. 
-
-    This function first logs the user out of active_client then deletes 
-    the account from accounts list. Depending on success or failure, 
-    send notification to client. 
+    '''
+    Processes an account deletion in request from a client.
+    If the operation succeeds, sends a success message to the client
+    at conn, and if it fails, sends a failure message to the client
+    at conn. Failure and success requirements are defined by the
+    account_list.delete_account method,
+    which this method is simply a user-interaction wrapper for.
 
     :param conn: socket object containing the connection to the client.
     :param buf: byte buffer containing the login request message body
@@ -219,11 +207,21 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     :param active_clients: the server_state.ActiveClients object.
     This is also a reference to a server database object that facilitates
     the transaction requests initated by the server.
-    :param pack_fmt: The fornat used to unpack the message body of the login
+    :param pack_fmt: The fornat used to unpack the message body of the
     request.
 
     :return: None.
     '''
+    def send_delete_success(conn):
+        print"sending delete success"
+        send_message('\x01' + pack('!I', 0) + '\x71', conn)
+        return
+
+
+    def send_delete_failure(conn, reason):
+        print"sending delete failure"
+        send_message('\x01' + pack('!I', 0) + '\x72', conn)
+
     values = unpack(pack_fmt, buf[6:12])
     username = values[0][0:5]
     own = values[0][5]
@@ -244,27 +242,19 @@ def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
     else:
         with lock:
             send_delete_failure(conn, reason)
-    return
-
 
 # OPERATION 5: LIST REQUEST
 
-def send_list_success(conn, accounts):
-    logging.info("sending list success")
-    send_message(
-        '\x01' + pack('!I', len(accounts)) + '\x51' +
-        pack(request_body_fmt['\x51'] % len(accounts), accounts), conn)
-
-
 def list_request(conn, buf, payload_len, lock, accounts,
                  active_clients, pack_fmt):
-    ''' 
-    Process a list accounts request. Depending on whether the user 
-    opted to use wildcard, it calls the function accordingly to list all a
-    accounts or only list accounts with a regex expression. 
+    '''
+    Processes an account listing request from a client.
+    If the operation succeeds, sends a success message to the client
+    at conn. Operation never fails.
 
     :param conn: socket object containing the connection to the client.
-    :param buf: byte buffer containing the login request message body
+    :param buf: byte buffer containing the request message body
+    :param payload: int, length of the message payload in the buffer
     :param lock: the lock primitive that we use to ensure that only one message
     is sent to a server at a time, and two messages originating from different
     threads (eg. server's response to a request and another client's
@@ -277,11 +267,17 @@ def list_request(conn, buf, payload_len, lock, accounts,
     :param active_clients: the server_state.ActiveClients object.
     This is also a reference to a server database object that facilitates
     the transaction requests initated by the server.
-    :param pack_fmt: The fornat used to unpack the message body of the login
+    :param pack_fmt: The fornat used to unpack the message body of the
     request.
 
     :return: None.
     '''
+    def send_list_success(conn, accounts):
+        logging.info("sending list success")
+        send_message(
+            '\x01' + pack('!I', len(accounts)) + '\x51' +
+            pack(request_body_fmt['\x51'] % len(accounts), accounts), conn)
+
     header = unpack(pack_header_fmt, buf[:6])
     pack_fmt = pack_fmt % payload_len
     print pack_fmt
@@ -298,24 +294,45 @@ def list_request(conn, buf, payload_len, lock, accounts,
 
 # OPERATION 6: SEND MESSAGE REQUEST
 
-
-def send_message_failure(connection, reason):
-    print "Sending failure of send message operation"
-    send_message(
-        '\x01' + pack('!I', len(reason)) + '\x32' +
-        pack(request_body_fmt['\x32'] % len(reason), reason), connection)
-    return None
-
-
-def send_message_success(username, connection):
-    print "sending success of send message"
-    send_message('\x01' + pack('!I', 5) + '\x31' +
-                 pack(username_fmt, username), connection)
-    return None
-
-
 def send_message_request(connection, buf, payload_len,
                          lock, accounts, active_clients, pack_fmt):
+    '''
+    Process the client's request to send a message to another user.
+    Success or failure is defined by the server_state.send_or_queue_message method, for
+    which this method is only a wrapper.
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the request message body
+    :param payload: int, length of the message payload in the buffer
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the
+    request.
+    '''
+    def send_message_failure(connection, reason):
+        print "Sending failure of send message operation"
+        send_message(
+            '\x01' + pack('!I', len(reason)) + '\x32' +
+            pack(request_body_fmt['\x32'] % len(reason), reason), connection)
+        return None
+
+
+    def send_message_success(username, connection):
+        print "sending success of send message"
+        send_message('\x01' + pack('!I', 5) + '\x31' +
+                     pack(username_fmt, username), connection)
+        return None
+
     header = unpack(pack_header_fmt, buf[:6])
     pack_fmt = pack_fmt % (payload_len - (2 * username_length))
     receiving_user = unpack(pack_fmt, buf[6:payload_len + 6])[1]
@@ -343,17 +360,15 @@ def send_message_request(connection, buf, payload_len,
 ################################################
 
 # This section of the file contains the two functions
-# that confirm to the server that a client received its delivery.
+# that unpack the messages containing inform for the server on whether or not
+# the delivery was successful.
 
-# CONFIRM RECEIPT
-def deliver_message_success(conn, netBuffer, payload_len, lock, accounts,
-                            active_clients, pack_fmt):
+def deliver_message_success(_, netBuffer, __, ___, ____, _____, _______):
     values = unpack(request_body_fmt['\x81'], netBuffer[6:14])
     print "\nSuccessfully delivered message to %s" % values[0]
 
 
-def deliver_message_failure(conn, netBuffer, payload_len, lock, accounts,
-                            active_clients, pack_fmt):
+def deliver_message_failure(_, netBuffer, payload_len, __, ___, ____, _____):
     reason = unpack(request_body_fmt['\x82'] %
                     payload_len - (2 * username_length),
                     netBuffer[6:payload_len + 6])[0]
