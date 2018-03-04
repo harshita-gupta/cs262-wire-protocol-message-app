@@ -196,9 +196,15 @@ def send_delete_failure(conn, reason):
 
 
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
-    values = unpack(pack_fmt, buf[6:14])
-    username = values[0]
+    values = unpack(pack_fmt, buf[6:12])
+    username = values[0][0:5]
+    own = values[0][5]
     if username in active_clients.sockets:
+        # if username is logged in and it's not yourself 
+        if own == "F":
+            with lock:
+                send_delete_failure(conn, "Cannot delete account of a different user who is currently logged in.")
+            return 
         active_clients.log_out(username)
     success, reason = accounts.delete_account(username)
     if success:

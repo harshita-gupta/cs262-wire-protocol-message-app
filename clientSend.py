@@ -46,11 +46,14 @@ def logout_request(conn, username):
 def delete_request(conn, username):
     if username:
         print "\nDELETING YOUR ACCOUNT \n"
+        own = "T"
     else:
         username = raw_input(
             'Enter the username of the account to be deleted: ')
-
-    send_message('\x01' + pack('!I', 5) + '\x70' +
+        own = "F"
+    username += own 
+    print "here"
+    send_message('\x01' + pack('!I', 6) + '\x70' +
                      pack(config.request_body_fmt['\x70'], username), conn)
 
 

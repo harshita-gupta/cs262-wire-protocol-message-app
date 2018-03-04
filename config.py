@@ -14,6 +14,8 @@ pack_header_fmt = '!cIc'
 
 username_fmt = "!%is" % username_length
 
+username_delete_fmt = "!%is" % (username_length + 1) 
+
 
 '''
 Dictionary linking opcodes to format strings used for packing and unpacking
@@ -29,7 +31,7 @@ request_body_fmt = {
     '\x10': username_fmt,  # create request
     '\x20': username_fmt,  # log in request
     '\x60': username_fmt,  # log out request
-    '\x70': username_fmt,  # delete request
+    '\x70': username_delete_fmt,  # delete request
 
     ########
     # SUCCESS CODES
