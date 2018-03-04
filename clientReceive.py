@@ -2,10 +2,28 @@ from struct import unpack
 import config
 from config import *
 
+'''
+These functions deliver success/failure messages to the client after 
+recceiving them from the server. These functions are called by client.py 
+after receiving a response from the server (which comes after the client 
+sends a request in clientSend.py). In the cases where a reason is provided
+for the success or failure, the function will display that reason to the 
+client as well. 
+
+:param netBuffer: Raw message received over the wire from the server 
+:return: Except for reason_string(buf), all functions return a tuple of 
+a boolean representing success (True) or failure (False) and an optional 
+field that can be used to pass the current_id back to the client if 
+the login was successful, so that the client may reset that variable. 
+'''
 
 def reason_string(buf):
     '''
+    Unpacks the header and reason string of a message from the server 
+    sent over the wire. 
 
+    :param buf: Raw message received over the wire from the server
+    :return: String representation of the reason 
     '''
     header = unpack(pack_header_fmt, buf[0:6])
     reason = unpack(request_body_fmt['\x32'] %

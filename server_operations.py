@@ -196,6 +196,34 @@ def send_delete_failure(conn, reason):
 
 
 def delete_request(conn, buf, _, lock, accounts, active_clients, pack_fmt):
+    ''' 
+    Process a delete account request. Does not allow deletion if
+    the user is logged in on another session and it is a different user
+    from yourself. 
+
+    This function first logs the user out of active_client then deletes 
+    the account from accounts list. Depending on success or failure, 
+    send notification to client. 
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the login request message body
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the login
+    request.
+
+    :return: None.
+    '''
     values = unpack(pack_fmt, buf[6:12])
     username = values[0][0:5]
     own = values[0][5]
@@ -230,6 +258,30 @@ def send_list_success(conn, accounts):
 
 def list_request(conn, buf, payload_len, lock, accounts,
                  active_clients, pack_fmt):
+    ''' 
+    Process a list accounts request. Depending on whether the user 
+    opted to use wildcard, it calls the function accordingly to list all a
+    accounts or only list accounts with a regex expression. 
+
+    :param conn: socket object containing the connection to the client.
+    :param buf: byte buffer containing the login request message body
+    :param lock: the lock primitive that we use to ensure that only one message
+    is sent to a server at a time, and two messages originating from different
+    threads (eg. server's response to a request and another client's
+    message delivery) do not get delivered simultaneously and thus
+    garble each other's byes. The lock is acquired before any
+    connection.send operation.
+    :param accounts: the server_state.AccountList object. This is a
+    reference to the server's database that this client will send
+    access/transaction requests to.
+    :param active_clients: the server_state.ActiveClients object.
+    This is also a reference to a server database object that facilitates
+    the transaction requests initated by the server.
+    :param pack_fmt: The fornat used to unpack the message body of the login
+    request.
+
+    :return: None.
+    '''
     header = unpack(pack_header_fmt, buf[:6])
     pack_fmt = pack_fmt % payload_len
     print pack_fmt

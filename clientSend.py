@@ -2,10 +2,24 @@ import config
 from config import send_message
 from struct import pack
 
+################################################
+# ClIENT SEND OPERATIONS ########################
+################################################
+
+'''
+This file contains the implementations for all requests the client 
+sends to the server. 
+'''
 
 # create new account
 def create_request(conn):
+    ''' 
+    Prompts user to input an original username. Repeats prompt if username
+    does not follow the specs of being alphanumeric and exactly 5 characters
+    long. Packs and send the message to the server. 
 
+    :param conn: connection to the server
+    '''
     print "\nCREATING AN ACCOUNT \n"
     print "enter a an alphanumeric username five characters long:"
     while True:
@@ -21,7 +35,13 @@ def create_request(conn):
 
 # log in to an existing account
 def login_request(conn):
+    ''' 
+    Prompts user to input an existing username. Repeats prompt if username
+    does not follow the specs of being alphanumeric and exactly 5 characters
+    long. Packs and send the message to the server. 
 
+    :param conn: connection to the server
+    '''
     print "\nLOGGING IN \n"
     print "Enter your username"
     while True:
@@ -37,6 +57,14 @@ def login_request(conn):
 
 # log out
 def logout_request(conn, username):
+    '''
+    Sends logout request to the server containing the username to be 
+    removed from the active_clients list
+
+    :param conn: connection to server
+    :param username: current_user variable to be removed from active_clients
+    list 
+    ''' 
     print "\nLOGGING OUT \n"
     send_message('\x01' + pack('!I', 5) + '\x60' +
                  pack(config.request_body_fmt['\x60'], username), conn)
@@ -44,6 +72,13 @@ def logout_request(conn, username):
 
 # delete
 def delete_request(conn, username):
+    '''
+    If the user is logged in, then indicate that they are deleting their
+    own account by setting own = "T". Otherwise, retrieve the input of which 
+    account they want to delete. Pack and send to server. 
+
+    :param username: current_id from client side 
+    '''
     if username:
         print "\nDELETING YOUR ACCOUNT \n"
         own = "T"
@@ -59,6 +94,10 @@ def delete_request(conn, username):
 
 # list
 def list_request(conn):
+    '''
+    Requests user to make a selection from functions. Set the 
+    regular expression accordingly. Pack and send to server
+    '''
     raw = raw_input(
         '''
         Choose from the following options:
