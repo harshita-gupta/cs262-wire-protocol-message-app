@@ -1,11 +1,13 @@
-# This is the main file for the client.
-# It sets up a connection with a server, prompts the user for input,
-# and processes these input.
-# Processed input and raw data from the server is used to determine
-# which functions in clientReceive and clientSend should be called.
-# The functions within clientReceive and clientSend handle specific
-# operations.
 
+'''
+This is the main file for the client.
+It sets up a connection with a server, prompts the user for input,
+and processes these input.
+Processed input and raw data from the server is used to determine
+which functions in clientReceive and clientSend should be called.
+The functions within clientReceive and clientSend handle specific
+operations.
+'''
 
 import sys
 import config
@@ -33,6 +35,11 @@ opcodes = {'\x11': create_success,
 
 
 def getStartupInput():
+    ''' 
+    Prompts user for numerical input corresponding to a function. 
+
+    :return: Returns the string representation of the numerical input 
+    '''
     print '''
 WELCOME - type the number of a function:
     (1) Create account
@@ -42,14 +49,17 @@ WELCOME - type the number of a function:
     '''
     while True:
         startupInput = raw_input('>> ')
+        # Input must be a digit between 0 and 5 exclusive 
         if (startupInput.isdigit() and
                 int(startupInput) > 0 and int(startupInput) < 5):
             break
-
     return startupInput
 
 
 def prompt_for_session_input():
+    '''
+    Displays menu of functions to user 
+    '''
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
     (3) Delete your account
@@ -61,6 +71,11 @@ YOU ARE LOGGED IN! - type the number of a function:
 
 
 def getSessionInput():
+    ''' 
+    Prompts user for numerical input corresponding to a function. 
+
+    :return: Returns the string representation of the numerical input 
+    '''
     prompt_for_session_input()
     while True:
         sessionInput = raw_input('>> ')
@@ -72,6 +87,12 @@ def getSessionInput():
 
 
 def processInput(requestNumber):
+    '''
+    Processes user function request by relaying it to the corresponding 
+    function in clientSend.py 
+
+    :param requestNumber: Function number inputted by user
+    '''
     # create
     if requestNumber == str(1):
         clientSend.create_request(sock)
@@ -100,6 +121,12 @@ def processInput(requestNumber):
 
 
 def get_server_message():
+    '''
+    Listens for and receives incoming messages from the server 
+
+    :return: header of server's message and entire message 
+    (including header)
+    '''
     try:
         retBuffer = sock.recv(1024)
     except:
@@ -117,7 +144,9 @@ def get_server_message():
 
 
 def getResponse():
-    # wait for server responses...
+    '''
+    Wait for server responses...
+    '''
     while True:
         header, buf = get_server_message()
 
@@ -137,6 +166,14 @@ def getResponse():
 
 
 def require_log_in():
+    ''' 
+    Brings the user back to the WELCOME page. If the user is creating
+    an account or logging in, it will return the username if getResponse()
+    is successful in order to set the current_user variable. Otherwise, 
+    process input as usual.
+
+    :return: Returns username if user is creating an account or logging in
+    ''' 
     while True:
         startupInput = getStartupInput()
 
