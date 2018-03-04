@@ -1,11 +1,5 @@
 Fixes to make:
 
--0.25 If someone tries to login with a user that has more than 5 characters the server will not have the expected behavior (returning a message saying wrong username). CLIENT-SIDE FIXED. SERVER-SIDE????? 
-
-- At one point when I tried to log in, I got an error about the string size in struct.unpack (The string it was trying to unpack on the client side did not match 5-character size), though I didn't track down exactly where it came from, as the error didn't occur on a few future attempts.
-
-- There is no server-side enforcement of much of the specification! For example, the client currently verifies that the username is 5 characters long, but the server does no checks.
-
 - If a user fails to log out properly (e.g., closes the terminal), the socket will not be closed. So if a user was logged in on the improperly closed client, the server considers the session still open and the user cannot log in elsewhere.
 
 The spec is clear. The implementation code has many comments, but it does not use any standard python documentation format (PyDoc), and there are many functions that are undocumented.
