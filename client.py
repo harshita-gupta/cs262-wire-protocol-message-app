@@ -14,6 +14,7 @@ import config
 import socket
 import select
 import clientSend
+import atexit
 from clientReceive import *
 
 global current_user
@@ -35,10 +36,10 @@ opcodes = {'\x11': create_success,
 
 
 def getStartupInput():
-    ''' 
-    Prompts user for numerical input corresponding to a function. 
+    '''
+    Prompts user for numerical input corresponding to a function.
 
-    :return: Returns the string representation of the numerical input 
+    :return: Returns the string representation of the numerical input
     '''
     print '''
 WELCOME - type the number of a function:
@@ -49,7 +50,7 @@ WELCOME - type the number of a function:
     '''
     while True:
         startupInput = raw_input('>> ')
-        # Input must be a digit between 0 and 5 exclusive 
+        # Input must be a digit between 0 and 5 exclusive
         if (startupInput.isdigit() and
                 int(startupInput) > 0 and int(startupInput) < 5):
             break
@@ -58,7 +59,7 @@ WELCOME - type the number of a function:
 
 def prompt_for_session_input():
     '''
-    Displays menu of functions to user 
+    Displays menu of functions to user
     '''
     print '''
 YOU ARE LOGGED IN! - type the number of a function:
@@ -71,10 +72,10 @@ YOU ARE LOGGED IN! - type the number of a function:
 
 
 def getSessionInput():
-    ''' 
-    Prompts user for numerical input corresponding to a function. 
+    '''
+    Prompts user for numerical input corresponding to a function.
 
-    :return: Returns the string representation of the numerical input 
+    :return: Returns the string representation of the numerical input
     '''
     prompt_for_session_input()
     while True:
@@ -88,8 +89,8 @@ def getSessionInput():
 
 def processInput(requestNumber):
     '''
-    Processes user function request by relaying it to the corresponding 
-    function in clientSend.py 
+    Processes user function request by relaying it to the corresponding
+    function in clientSend.py
 
     :param requestNumber: Function number inputted by user
     '''
@@ -122,9 +123,9 @@ def processInput(requestNumber):
 
 def get_server_message():
     '''
-    Listens for and receives incoming messages from the server 
+    Listens for and receives incoming messages from the server
 
-    :return: header of server's message and entire message 
+    :return: header of server's message and entire message
     (including header)
     '''
     try:
@@ -166,14 +167,14 @@ def getResponse():
 
 
 def require_log_in():
-    ''' 
+    '''
     Brings the user back to the WELCOME page. If the user is creating
     an account or logging in, it will return the username if getResponse()
-    is successful in order to set the current_user variable. Otherwise, 
+    is successful in order to set the current_user variable. Otherwise,
     process input as usual.
 
     :return: Returns username if user is creating an account or logging in
-    ''' 
+    '''
     while True:
         startupInput = getStartupInput()
 
@@ -190,8 +191,14 @@ def require_log_in():
             getResponse()
 
 
+def logout_current_user(conn):
+    global current_user
+    clientSend.logout_request(conn, current_user)
+
+
 if __name__ == '__main__':
 
+    global current_user
     logging.basicConfig(
         format=logging_fmt,
         filename="clientLog.log")
@@ -208,6 +215,7 @@ if __name__ == '__main__':
     # CREATE AN ACCOUNT
     current_user = None
     current_user = require_log_in()
+    atexit.register(logout_current_user, sock)
 
     prompt_for_session_input()
 
