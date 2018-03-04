@@ -3,6 +3,8 @@ All connections are on port 12345. Must use Python 2, not Python 3.
 
 MAKE SURE TO GIT CLONE THE ENTIRE REPOSITORY OR DOWNLOAD ALL THE FILES. YOU NEED ALL THE FILES TO RUN THE PROGRAM.
 
+Our wire protocol specification is in MessageAppWireProtocol.java. For detailed specification and edge case information, please look there.
+
 SECTION 1. RUNNING SERVER AND CLIENT
 1) To run, open a terminal and run python server.py.
 2) Open a second terminal and run python client.py.
